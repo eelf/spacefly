@@ -13,6 +13,7 @@ class Camera {
 	public: float camx,camy,camz,camr,camq;
 	float cavx,cavy,cavz,cavr,cavq;
 	float a, b;
+	int v;
 
 	Camera() {
 		init();
@@ -28,8 +29,24 @@ class Camera {
 		cavz = 0.0;
 		cavq = 0.0;
 		cavr = 0.0;
-		a = -0.3;
-		b = -0.0001;
+		a = -0.0005;
+		b = -0.0005;
+		v = 0;
+	}
+	void switchview() {
+		v++;
+		switch(v & 0x3) {
+		case 0: camq =   0.0; break;
+		case 1: camq =  90.0; break;
+		case 2: camq = 180.0; break;
+		case 3: camq = 270.0; break;
+		}
+		switch (v >> 2 & 0x3) {
+		case 0: camr =   0.0; break;
+		case 1: camr =  90.0; break;
+		case 2: camr = 180.0; break;
+		case 3: camr = 270.0; break;
+		}
 	}
 	void accel() {
 		cavx = abssum(cavx, a);
@@ -51,17 +68,19 @@ class Camera {
 	void move(float f, float u, float r) {
 		float sinr = float(sin(camr * M_180_DIV_PI));
 		float cosr = float(cos(camr * M_180_DIV_PI));
+		
 		float cosq = float(cos(camq * M_180_DIV_PI));
 		float sinq = float(sin(camq * M_180_DIV_PI));
-		cavy += (f * sinr + u * cosr) * 0.01;
-		cavx += (r * cosr * cosq - u * sinr + f * sinq) * 0.01;
-		cavz += (f * cosr * cosq - u * sinr + r * sinq) * 0.01;
+		
+		cavy += (-f * sinr            + u * cosr) * 0.05;
+		cavx += ( f * sinq + r * cosq + u * sinr * sinq) * 0.05;
+		cavz += (-f * cosq + r * sinq - u * sinr * cosq) * 0.05;
 		
 	}
 	// horisontal vertical
 	void rotate(float h, float v) {
-		cavq += h * 0.0002;
-		cavr += v * 0.0002;
+		cavq += h * 0.05;
+		cavr += v * 0.05;
 	}
 	void checkCam() {
 		if (this->camx < -10.0f) this->camx = -10.0f;
@@ -88,11 +107,6 @@ class Camera {
 	}
 };
 Camera cam;
-
-
-
-
-
 
 
 
@@ -189,6 +203,38 @@ void DrawWalls() {
 	DrawNet(20.0f, 30, 30);
 	glPopMatrix();
 }
+float distraw(float x1, float y1, float z1, float x2, float y2, float z2) {
+	float dx, dy, dz;
+	dx = x2 - x1;
+	dy = y2 - y1;
+	dz = z2 - z1;
+	return dx * dx + dy * dy + dz * dz;
+}
+float dist(float x1, float y1, float z1, float x2, float y2, float z2) {
+	return sqrt(distraw(x1, y1, z1, x2, y2, z1));
+}
+class MassObject {
+	public: float mass, x, y, z, q, r, vx, vy, vz, vq, vr, v;
+	MassObject(float cmass, float cx, float cy, float cz) {
+		mass = cmass;
+		x = cx;
+		y = cy;
+		z = cz;
+	}
+	void draw() {
+		x += vx;
+		y += vy;
+		z += vz;
+		DrawPrism(x, y, z, q, r, 0.1, 0.1, 0.1);
+	}
+	void gravity(MassObject *o) {
+		float dist = distraw(x, y, z, o->x, o->y, o->z);
+		float a = o->mass / dist;
+		v += a;
+		//vx = (x - o->x) * v;
+	}
+	
+};
 int DrawGLScene( GLvoid ) {               // Здесь будет происходить вся прорисовка
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );      // Очистить экран и буфер глубины
 	glLoadIdentity();              // Сбросить текущую матрицу
@@ -197,7 +243,6 @@ int DrawGLScene( GLvoid ) {               // Здесь будет происх�
 	glRotatef(cam.camq,0.0f,1.0f,0.0f);
 	glTranslatef(cam.camx, cam.camy, cam.camz);
 	cam.inert();
-	
 	DrawCoords();
 	DrawWalls();
 	DrawPrism(-2.0, 0.0, -2.0, 0.0, 0.0, 1.0, 1.0, 1.0);
@@ -214,8 +259,28 @@ int DrawGLScene( GLvoid ) {               // Здесь будет происх�
 	if (h < -1.9f) v = 0.006f;
 */
 
+BOOL  done = false;            // Логическая переменная для выхода из цикла
 
-
+void onKeyDown(int key) {
+	switch(key) {
+	case VK_ESCAPE: done = true; break;
+	case 'W': cam.move(-1.0, 0.0, 0.0); break;
+	case 'S': cam.move( 1.0, 0.0, 0.0); break;
+	case 'E': cam.move(0.0, 0.0, -1.0); break;
+	case 'Q': cam.move(0.0, 0.0,  1.0); break;
+	case 'R': cam.move(0.0, -1.0, 0.0); break;
+	case 'F': cam.move(0.0,  1.0, 0.0); break;
+	case 'A': cam.rotate(-1.0,  0.0); break;
+	case 'D': cam.rotate( 1.0,  0.0); break;
+	case 'T': cam.rotate( 0.0, -1.0); break;
+	case 'G': cam.rotate( 0.0,  1.0); break;
+	}
+}
+void onKeyUp(int key) {
+	switch (key) {
+	case 'C': cam.switchview(); break;
+	}
+}
 
 
 
@@ -225,7 +290,6 @@ int WINAPI WinMain(  HINSTANCE  hInstance,        // Дескриптор при
       LPSTR    lpCmdLine,        // Параметры командной строки
       int    nCmdShow ) {       // Состояние отображения окна
 	MSG  msg;              // Структура для хранения сообщения Windows
-	BOOL  done = false;            // Логическая переменная для выхода из цикла
 	// Спрашивает пользователя, какой режим экрана он предпочитает
 	/*
 	if( MessageBox( NULL, "Хотите ли Вы запустить приложение в полноэкранном режиме?",  "Запустить в полноэкранном режиме?", MB_YESNO | MB_ICONQUESTION) == IDNO ) {
@@ -247,13 +311,10 @@ int WINAPI WinMain(  HINSTANCE  hInstance,        // Дескриптор при
 		} else {               // Если нет сообщений
 			// Прорисовываем сцену.
 			if( active ) {         // Активна ли программа?
-				if(keys[VK_ESCAPE]) {       // Было ли нажата клавиша ESC?
-					done = true;      // ESC говорит об останове выполнения программы
-				} else {           // Не время для выхода, обновим экран.
 					DrawGLScene();        // Рисуем сцену
 					SwapBuffers( hDC );    // Меняем буфер (двойная буферизация)
-				}
 			}
+			/*
 			if( keys[VK_F1] ) {         // Была ли нажата F1?
 				keys[VK_F1] = false;        // Если так, меняем значение ячейки массива на false
 				KillGLWindow();          // Разрушаем текущее окно
@@ -263,43 +324,10 @@ int WINAPI WinMain(  HINSTANCE  hInstance,        // Дескриптор при
 					return 0;        // Выходим, если это невозможно
 				}
 			}
-			if( keys['W'] ) {
-				cam.move(-1.0, 0.0, 0.0);
-			}
-			if( keys['S'] ) {
-				cam.move(1.0, 0.0, 0.0);
-			}
-			if( keys['E'] ) {
-				cam.move(0.0, 0.0, -1.0);
-			}
-			if( keys['Q'] ) {
-				cam.move(0.0, 0.0,  1.0);
-			}
-			if( keys['R'] ) {
-				cam.move(0.0, -1.0, 0.0);
-			}
-			if( keys['F'] ) {
-				cam.move(0.0,  1.0, 0.0);
-			}
-
-			if( keys['A'] ) {
-				cam.rotate(-1.0,  0.0);
-			}
-			if( keys['D'] ) {
-				cam.rotate( 1.0,  0.0);
-			}
-			if( keys['T'] ) {
-				cam.rotate( 0.0, -1.0);
-			}
-			if( keys['G'] ) {
-				cam.rotate( 0.0,  1.0);
-			}
-			if( keys['C'] ) {
-				cam.init();
-			}
+			*/
 			
 		}
-		MsgWaitForMultipleObjects(0, NULL, FALSE, 1, QS_ALLINPUT);
+		MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT);
 		//Sleep(10);
 	}
 	// Shutdown
