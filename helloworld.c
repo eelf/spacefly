@@ -1,4 +1,9 @@
-#include <GL/glut.h>
+#ifdef macintosh
+	#include <GLUT/glut.h>
+	#include <GL/gl.h>
+#elseif _WIN32 // _WIN32
+	#include <GL/glut.h>
+#endif
 #include <math.h>
 
 #define PI 3.1415926
