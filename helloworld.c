@@ -1,12 +1,6 @@
-#if defined(__APPLE__) || defined(MACOSX)
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glu.h>
-	#include <GLUT/glut.h>
-#else
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-	#include <GL/freeglut.h>
-#endif
+#include "defs.h"
+
+#include <stdlib.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -72,11 +66,19 @@ t_side p[] = {
 };
 char s[40];
 
+void renderBitmapCharacher(float x, float y, float z, void *font,char *string)
+{
+	
+	char *c;
+	glRasterPos3f(x, y,z);
+	for (c=string; *c != '\0'; c++) {
+		glutBitmapCharacter(font, *c);
+	}
+}
 
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-		
 	
 	glTranslatef(camera.x, camera.y, camera.z);
 	glRotatef(camera.q, 1.0, 0.0, 0.0);
@@ -85,13 +87,13 @@ void renderScene(void) {
 	glColor3f(1.0, 1.0, 0.0); 
   	glRasterPos3f(0.0,0.5,0.4);
   	sprintf(s, "%d", v);
-	glutBitmapString(GLUT_BITMAP_8_BY_13, (const unsigned char *)s);
-	
 
+	glPushMatrix();
+		renderBitmapCharacher(0,1.8,0,GLUT_BITMAP_8_BY_13,(const unsigned char *)s);
+	glPopMatrix();
+	
 //	render_pieces(p, 0.5, 0.45);
 	render_sides(p, 0.5, 0.45);
-
-
 
 	glutSwapBuffers();
 	
