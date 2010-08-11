@@ -1,12 +1,11 @@
-#ifdef macintosh
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
 	#include <GLUT/glut.h>
-	#include <GL/gl.h>
-#elseif _WIN32
-	#include <GL/glut.h>
-//	#include <windows.h>
 #else
 	#include <GL/gl.h>
-	#include <GL/glut.h>
+	#include <GL/glu.h>
+	#include <GL/freeglut.h>
 #endif
 
 #include "side.h"

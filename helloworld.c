@@ -1,11 +1,10 @@
-#ifdef macintosh
+#if defined(__APPLE__) || defined(MACOSX)
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
 	#include <GLUT/glut.h>
-	#include <GL/gl.h>
-#elseif _WIN32
-	#include <GL/glut.h>
-//	#include <windows.h>
 #else
 	#include <GL/gl.h>
+	#include <GL/glu.h>
 	#include <GL/freeglut.h>
 #endif
 
@@ -18,6 +17,8 @@
 
 t_camera camera;
 int v = 0;
+
+int Times;
 /*
 t_piece p[] = {
 	{-1, -1, 1,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 3},
@@ -85,6 +86,7 @@ void renderScene(void) {
   	glRasterPos3f(0.0,0.5,0.4);
   	sprintf(s, "%d", v);
 	glutBitmapString(GLUT_BITMAP_8_BY_13, (const unsigned char *)s);
+	
 
 //	render_pieces(p, 0.5, 0.45);
 	render_sides(p, 0.5, 0.45);
