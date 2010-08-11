@@ -11,15 +11,15 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "piece.h"
+#include "side.h"
 #include "camera.h"
 #include "helloworld.h"
 #define PDEB 10
 
 t_camera camera;
 int v = 0;
+/*
 t_piece p[] = {
-// f111, d100, l001, r101, u010, b110
 	{-1, -1, 1,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 3},
 	{ 0, -1, 1,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 2},
 	{ 1, -1, 1,   0.0,   0.0,270.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 3},
@@ -60,6 +60,15 @@ t_piece p[] = {
 	{ 1,  1,-1,   0.0, 180.0, 90.0, {1.0, 1.0, 0.0}, {1.0, 0.0, 1.0}, {0.0, 1.0, 0.0}, 3}
 
 };
+*/
+t_side p[] = {
+{0, {{1,1,1}, {1,1,1}, {1,1,1}, {1,1,1}, {1,1,1}, {1,1,1}, {1,1,1}, {1,1,1}, {1,1,1}}},
+{1, {{0,0,1}, {0,0,1}, {0,0,1}, {0,0,1}, {0,0,1}, {0,0,1}, {0,0,1}, {0,0,1}, {0,0,1}}},
+{2, {{1,0,0}, {1,0,0}, {1,0,0}, {1,0,0}, {1,0,0}, {1,0,0}, {1,0,0}, {1,0,0}, {1,0,0}}},
+{3, {{0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}}},
+{4, {{1,1,0}, {1,1,0}, {1,1,0}, {1,1,0}, {1,1,0}, {1,1,0}, {1,1,0}, {1,1,0}, {1,1,0}}},
+{5, {{1,0,1}, {1,0,1}, {1,0,1}, {1,0,1}, {1,0,1}, {1,0,1}, {1,0,1}, {1,0,1}, {1,0,1}}}
+};
 char s[40];
 
 
@@ -77,7 +86,8 @@ void renderScene(void) {
   	sprintf(s, "%d", v);
 	glutBitmapString(GLUT_BITMAP_8_BY_13, (const unsigned char *)s);
 
-	render_pieces(p, 0.5, 0.45);
+//	render_pieces(p, 0.5, 0.45);
+	render_sides(p, 0.5, 0.45);
 
 
 
@@ -123,13 +133,13 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'q') camera_rotate(&camera, -1.0, 0.0);
 	if (key == 'z') camera_rotate(&camera,  1.0, 0.0);
 
-	if (key == 'u') rotate_pieces(0, (t_piece*)&p);
-	if (key == 'i') rotate_pieces(2, (t_piece*)&p);
-	if (key == 'o') rotate_pieces(4, (t_piece*)&p);
-	if (key == 'j') rotate_pieces(1, (t_piece*)&p);
-	if (key == 'k') rotate_pieces(3, (t_piece*)&p);
-	if (key == 'l') rotate_pieces(5, (t_piece*)&p);
-
+	if (key == 'u') rotate_sides(0, (t_side*)&p);
+	if (key == 'i') rotate_sides(2, (t_side*)&p);
+	if (key == 'o') rotate_sides(4, (t_side*)&p);
+	if (key == 'j') rotate_sides(1, (t_side*)&p);
+	if (key == 'k') rotate_sides(3, (t_side*)&p);
+	if (key == 'l') rotate_sides(5, (t_side*)&p);
+/*
 	if (key == 'v') {
 		p[PDEB].rx += 90.0;
 		if (p[PDEB].rx == 360.0) {
@@ -143,7 +153,7 @@ void keyPressed(unsigned char key, int x, int y) {
 		}
 		v = (int)p[PDEB].rz / 0.9  + (int)p[PDEB].ry / 9 + (int)p[PDEB].rx / 90;
 	}
-
+*/
   	sprintf(s, "%c", key);
 	
 }
