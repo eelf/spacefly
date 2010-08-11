@@ -1,33 +1,39 @@
 #ifdef macintosh
 	#include <GLUT/glut.h>
 	#include <GL/gl.h>
-#elseif _WIN32 // _WIN32
+#elseif _WIN32
 	#include <GL/glut.h>
+//	#include <windows.h>
+#else
+	#include <GL/gl.h>
+	#include <GL/freeglut.h>
 #endif
+
 #include <math.h>
+#include <stdio.h>
+#include "piece.h"
+#include "camera.h"
+#include "helloworld.h"
 
-#define PI 3.1415926
-#define DELIT 0.017453292
-#define PI75 2.35619445
-#define PI50 1.5707963
-#define PI25 0.78539815
+t_camera camera;
+t_piece p1 = {-1.0, -1.0, 1.0,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 3};
+t_piece p2 = { 0.0, -1.0, 1.0,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 2};
+t_piece p3 = { 1.0, -1.0, 1.0,   0.0,   0.0,270.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 3};
+char s[40];
 
-float angle=0.0;
-float cosa, cosb, cosc, cosd;
 float coss(float cosx, float scal) {
 	return scal * cosx + scal;
 }
 void renderScene(void) {
-
 	// notice that we're now clearing the depth buffer 
 	// as well this is required, otherwise the depth buffer 
 	// gets filled and nothing gets rendered. 
 	// Try it out, remove the depth buffer part.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+	glLoadIdentity();
 	// save the previous settings, in this case save 
 	// we're refering to the camera settings.
-	glPushMatrix();
+//	glPushMatrix();
 	
 	// Perform a rotation around the y axis (0,1,0) 
 	// by the amount of degrees defined in the variable angle
@@ -35,11 +41,28 @@ void renderScene(void) {
 		cosb = cos(angle * DELIT - PI25);
 		cosc = cos(angle * DELIT - PI50);
 		cosd = cos(angle * DELIT - PI75);
-	glRotatef(45.0,1.0,1.0,0.0);
-	glRotatef(cosa,0.5,1.0,0.0);
+		
+		
+	
+	glRotatef(camera.q, 1.0, 0.0, 0.0);
+	glRotatef(camera.r, 0.0, 1.0, 0.0);
+	glTranslatef(camera.x, camera.y, camera.z);
+//	glRotatef(cosa,0.5,1.0,0.0);
+
+	glColor3f(0.7+0.3*cosa, 1.0, 0.0); 
+  	glRasterPos3f(0.0,0.5,0.4);
+  	sprintf(s, "%.2f %.2f", camera.z, camera.vz);
+	glutBitmapString(GLUT_BITMAP_8_BY_13, (const unsigned char *)s);
 //		glColor3f(1.0,0.0,1.0*cosb);
 //		glColor3f(0.0,1.0*cosa,1.0);
 //		glColor3f(1.0*cosa,0.0,1.0);
+
+	render_piece(p1, 0.3, 0.45);
+	render_piece(p2, 0.3, 0.45);
+	render_piece(p3, 0.3, 0.45);
+
+	glPushMatrix();
+	glTranslatef(2.0,-1.0,-1.0);
 	glBegin(GL_QUAD_STRIP);
 
 		glColor3f(0.0,0.0,1.0);
@@ -66,49 +89,52 @@ void renderScene(void) {
 		glColor3f(0.0,0.0,0.8+0.2*cosd);
 		glVertex3f(3.0,1.0,0.2*cosd);
 	glEnd();
-	
-	// discard the modelling transformations
-	// after this the matrix will have only the camera settings.
 	glPopMatrix();
 	
-	// swapping the buffers causes the rendering above to be 
-	// shown
+
 	glutSwapBuffers();
 	
 	// finally increase the angle for the next frame
 	angle += 0.2;
 	if (angle > 360.0) angle = 0.0;
+	camera_inert(&camera);
 }
 
 
 void changeSize(int w, int h) {
-
-	// Prevent a divide by zero, when window is too short
-	// (you cant make a window of zero width).
-	if(h == 0)
-		h = 1;
-
-	float ratio = 1.0* w / h;
-
 	// Reset the coordinate system before modifying
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
 	// Set the viewport to be the entire window
+	if (h == 0) h = 1;
+	float ratio = 1.0* w / h;
 	glViewport(0, 0, w, h);
 
 	// Set the correct perspective.
 	gluPerspective(45,ratio,1,1000);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0.0,0.0,5.0, 
-		      0.0,0.0,-1.0,
-			  0.0f,1.0f,0.0f);
+//	glLoadIdentity();
+//	gluLookAt(0.0,0.0,5.0, 
+//		      0.0,0.0,-1.0,
+//			  0.0f,1.0f,0.0f);
 
 
 }
 
-void main(int argc, char **argv) {
+void keyPressed(unsigned char key, int x, int y) {
+	if (key == 27) exit(0);
+	if (key == 'w') camera_move(&camera,  1.0, 0.0, 0.0);
+	if (key == 's') camera_move(&camera, -1.0, 0.0, 0.0);
+	if (key == 'a') camera_rotate(&camera,  0.0,-1.0);
+	if (key == 'd') camera_rotate(&camera,  0.0, 1.0);
+	if (key == 'q') camera_rotate(&camera, -1.0, 0.0);
+	if (key == 'z') camera_rotate(&camera,  1.0, 0.0);
+  	sprintf(s, "%c", key);
+	
+}
+
+int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	
 	// This is where we say that we want a double buffer
@@ -123,10 +149,15 @@ void main(int argc, char **argv) {
 	glutIdleFunc(renderScene);
 	
 	glutReshapeFunc(changeSize);
+	glutKeyboardFunc(keyPressed);
 	
 	// enable depth testing
 	glEnable(GL_DEPTH_TEST);
+  	sprintf(s, "%c", 65);
+  	camera_init(&camera);
 	glutMainLoop();
+	// never happen lol, main() must return int
+	return 0;
 }
 
 
