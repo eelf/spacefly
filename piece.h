@@ -3,7 +3,7 @@
 
 typedef struct {
 	// translate
-	float x, y, z;
+	int x, y, z;
 	// rotate
 	float rx, ry, rz;
 	// color vectors
@@ -11,6 +11,8 @@ typedef struct {
 	int sides;
 } t_piece;
 
+void rotate_pieces(int gran, t_piece* p);
+void render_pieces(t_piece *p, float scale, float size);
 void render_piece(t_piece p, float scale, float size);
 
 #endif

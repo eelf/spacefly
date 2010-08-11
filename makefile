@@ -1,5 +1,5 @@
 CC = gcc
-CCFLAGS = -Wall -g
+CCFLAGS = -Wall -g -std=c99
 LDFLAGS =
 OBJDIR = objs
 

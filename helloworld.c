@@ -14,89 +14,78 @@
 #include "piece.h"
 #include "camera.h"
 #include "helloworld.h"
+#define PDEB 10
 
 t_camera camera;
-t_piece p1 = {-1.0, -1.0, 1.0,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 3};
-t_piece p2 = { 0.0, -1.0, 1.0,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 2};
-t_piece p3 = { 1.0, -1.0, 1.0,   0.0,   0.0,270.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 3};
+int v = 0;
+t_piece p[] = {
+// f111, d100, l001, r101, u010, b110
+	{-1, -1, 1,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 3},
+	{ 0, -1, 1,   0.0,   0.0,180.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 2},
+	{ 1, -1, 1,   0.0,   0.0,270.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 3},
+
+	{-1,  0, 1,   0.0,   0.0, 90.0, {1.0, 1.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 2},
+	{ 0,  0, 1,   0.0,   0.0,  0.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 1},
+	{ 1,  0, 1,   0.0,   0.0,270.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 2},
+
+	{-1,  1, 1,   0.0,   0.0, 90.0, {1.0, 1.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 1.0, 0.0}, 3},
+	{ 0,  1, 1,   0.0,   0.0,  0.0, {1.0, 1.0, 1.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, 2},
+	{ 1,  1, 1,   0.0,   0.0,  0.0, {1.0, 1.0, 1.0}, {0.0, 1.0, 0.0}, {1.0, 0.0, 1.0}, 3},
+
+
+
+	{-1, -1, 0,   0.0, 270.0,180.0, {0.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 2},
+	{ 0, -1, 0,  90.0,   0.0,  0.0, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 1},
+	{ 1, -1, 0,   0.0,  90.0,180.0, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, 2},
+
+	{-1,  0, 0,   0.0, 270.0,  0.0, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 1},
+//	{ 0,  0, 0,   0.0,   0.0,  0.0, {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 1},
+	{ 1,  0, 0,   0.0,  90.0,  0.0, {1.0, 0.0, 1.0}, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 1},
+
+	{-1,  1, 0,   0.0, 270.0,  0.0, {0.0, 0.0, 1.0}, {0.0, 1.0, 0.0}, {0.0, 1.0, 0.0}, 2},
+	{ 0,  1, 0, 270.0,   0.0,  0.0, {0.0, 1.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, 1},
+	{ 1,  1, 0,   0.0,  90.0,  0.0, {1.0, 0.0, 1.0}, {0.0, 1.0, 0.0}, {1.0, 0.0, 1.0}, 2},
+
+
+	{-1, -1,-1,   0.0, 180.0,270.0, {1.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 3},
+	{ 0, -1,-1,   0.0, 180.0,180.0, {1.0, 1.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 2},
+	{ 1, -1,-1,   0.0, 180.0,180.0, {1.0, 1.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 1.0}, 3},
+
+	{-1,  0,-1,   0.0, 180.0,270.0, {1.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 2},
+	{ 0,  0,-1,   0.0, 180.0,  0.0, {1.0, 1.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 1},
+	{ 1,  0,-1,   0.0, 180.0, 90.0, {1.0, 1.0, 0.0}, {1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 2},
+
+	{-1,  1,-1,   0.0, 180.0,  0.0, {1.0, 1.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, 3},
+	{ 0,  1,-1,   0.0, 180.0,  0.0, {1.0, 1.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, 2},
+	{ 1,  1,-1,   0.0, 180.0, 90.0, {1.0, 1.0, 0.0}, {1.0, 0.0, 1.0}, {0.0, 1.0, 0.0}, 3}
+
+};
 char s[40];
 
-float coss(float cosx, float scal) {
-	return scal * cosx + scal;
-}
+
 void renderScene(void) {
-	// notice that we're now clearing the depth buffer 
-	// as well this is required, otherwise the depth buffer 
-	// gets filled and nothing gets rendered. 
-	// Try it out, remove the depth buffer part.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	// save the previous settings, in this case save 
-	// we're refering to the camera settings.
-//	glPushMatrix();
-	
-	// Perform a rotation around the y axis (0,1,0) 
-	// by the amount of degrees defined in the variable angle
-		cosa = cos(angle * DELIT);
-		cosb = cos(angle * DELIT - PI25);
-		cosc = cos(angle * DELIT - PI50);
-		cosd = cos(angle * DELIT - PI75);
-		
 		
 	
+	glTranslatef(camera.x, camera.y, camera.z);
 	glRotatef(camera.q, 1.0, 0.0, 0.0);
 	glRotatef(camera.r, 0.0, 1.0, 0.0);
-	glTranslatef(camera.x, camera.y, camera.z);
-//	glRotatef(cosa,0.5,1.0,0.0);
 
-	glColor3f(0.7+0.3*cosa, 1.0, 0.0); 
+	glColor3f(1.0, 1.0, 0.0); 
   	glRasterPos3f(0.0,0.5,0.4);
-  	sprintf(s, "%.2f %.2f", camera.z, camera.vz);
+  	sprintf(s, "%d", v);
 	glutBitmapString(GLUT_BITMAP_8_BY_13, (const unsigned char *)s);
-//		glColor3f(1.0,0.0,1.0*cosb);
-//		glColor3f(0.0,1.0*cosa,1.0);
-//		glColor3f(1.0*cosa,0.0,1.0);
 
-	render_piece(p1, 0.3, 0.45);
-	render_piece(p2, 0.3, 0.45);
-	render_piece(p3, 0.3, 0.45);
+	render_pieces(p, 0.5, 0.45);
 
-	glPushMatrix();
-	glTranslatef(2.0,-1.0,-1.0);
-	glBegin(GL_QUAD_STRIP);
 
-		glColor3f(0.0,0.0,1.0);
-		glVertex3f(0.0,0.0,0.05*cosa);
-		
-		glColor3f(0.0,0.0,1.0);
-		glVertex3f(0.0,1.0,0.05*cosa);
-		
-		glColor3f(0.0,0.0,0.9+0.1*cosb);
-		glVertex3f(1.0,0.0,0.1*cosb);
-
-		glColor3f(0.0,0.0,0.9+0.1*cosb);
-		glVertex3f(1.0,1.0,0.1*cosb);
-
-		glColor3f(0.0,0.0,0.85+0.15*cosc);
-		glVertex3f(2.0,0.0,0.15*cosc);
-		
-		glColor3f(0.0,0.0,0.85+0.15*cosc);
-		glVertex3f(2.0,1.0,0.15*cosc);
-
-		glColor3f(0.0,0.0,0.8+0.2*cosd);
-		glVertex3f(3.0,0.0,0.2*cosd);
-
-		glColor3f(0.0,0.0,0.8+0.2*cosd);
-		glVertex3f(3.0,1.0,0.2*cosd);
-	glEnd();
-	glPopMatrix();
-	
 
 	glutSwapBuffers();
 	
-	// finally increase the angle for the next frame
-	angle += 0.2;
+	angle += 0.1;
 	if (angle > 360.0) angle = 0.0;
+//	camera.r = cos(angle * DELIT) * 5.0;
 	camera_inert(&camera);
 }
 
@@ -126,10 +115,35 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 27) exit(0);
 	if (key == 'w') camera_move(&camera,  1.0, 0.0, 0.0);
 	if (key == 's') camera_move(&camera, -1.0, 0.0, 0.0);
+	if (key == '1') camera_move(&camera,  0.0, 0.0,-1.0);
+	if (key == '3') camera_move(&camera,  0.0, 0.0, 1.0);
+
 	if (key == 'a') camera_rotate(&camera,  0.0,-1.0);
 	if (key == 'd') camera_rotate(&camera,  0.0, 1.0);
 	if (key == 'q') camera_rotate(&camera, -1.0, 0.0);
 	if (key == 'z') camera_rotate(&camera,  1.0, 0.0);
+
+	if (key == 'u') rotate_pieces(0, (t_piece*)&p);
+	if (key == 'i') rotate_pieces(2, (t_piece*)&p);
+	if (key == 'o') rotate_pieces(4, (t_piece*)&p);
+	if (key == 'j') rotate_pieces(1, (t_piece*)&p);
+	if (key == 'k') rotate_pieces(3, (t_piece*)&p);
+	if (key == 'l') rotate_pieces(5, (t_piece*)&p);
+
+	if (key == 'v') {
+		p[PDEB].rx += 90.0;
+		if (p[PDEB].rx == 360.0) {
+			p[PDEB].rx = 0.0;
+			p[PDEB].ry += 90.0;
+			if (p[PDEB].ry == 360.0) {
+				p[PDEB].ry = 0.0;
+				p[PDEB].rz += 90.0;
+				if (p[PDEB].rz == 360.0) p[PDEB].rz = 0.0;
+			}
+		}
+		v = (int)p[PDEB].rz / 0.9  + (int)p[PDEB].ry / 9 + (int)p[PDEB].rx / 90;
+	}
+
   	sprintf(s, "%c", key);
 	
 }

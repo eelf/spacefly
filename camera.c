@@ -21,7 +21,7 @@ void camera_init(t_camera* camera) {
 	camera->vq = 0.0;
 
 	camera->a = -0.000005;
-	camera->b = -0.00005;
+	camera->b = -0.0005;
 }
 
 void camera_accel(t_camera* camera) {
@@ -50,9 +50,9 @@ void camera_move(t_camera* camera, float f, float u, float r) {
 	float sinq = sin(camera->q * M_PI_DIV_180);
 	
 
-	camera->vx += ( f * sinq + r * cosq + u * sinr * sinq) * 0.001;
-	camera->vy += (-f * sinr            + u * cosr) * 0.001;
-	camera->vz += (-f * cosq + r * sinq - u * sinr * cosq) * 0.001;
+	camera->vx += ( f * sinr * cosq) * 0.001;
+	camera->vy += (0) * 0.001;
+	camera->vz += ( f * cosr * cosq) * 0.001;
 	
 }
 // horisontal vertical
@@ -69,8 +69,8 @@ void camera_check(t_camera* camera) {
 	if (camera->y >   1.0f) camera->y = 1.0f;
 	if (camera->q <   0.0f) camera->q = 360.0f;
 	if (camera->q > 360.0f) camera->q = 0.0f;
-	if (camera->r <   0.0f) camera->r = 360.0f;
-	if (camera->r > 360.0f) camera->r = 0.0f;
+	if (camera->r < -180.0f) camera->r =  180.0f;
+	if (camera->r >  180.0f) camera->r = -180.0f;
 
 	if (camera->vx < -1.0f) camera->vx = -1.0f;
 	if (camera->vx >  1.0f) camera->vx =  1.0f;
