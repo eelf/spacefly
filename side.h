@@ -1,7 +1,8 @@
 #ifndef _SIDE_H_
 #define _SIDE_H_
 
-typedef float t_color[3];
+#include "base_types.h"
+
 typedef struct {
 	int side;
 	t_color color[9];

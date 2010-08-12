@@ -155,19 +155,19 @@ void render_side(t_side p, float scale, float size) {
 	float dsize = size * 2;
 	glScalef(scale, scale, scale);
 	for(int i = -1; i < 2; i++) {
-		glPushMatrix();
+		//glPushMatrix();
 		glTranslatef(0,i * dsize,0);
 	for(int j = -1; j < 2; j++) {
 		glPushMatrix();
 		glTranslatef(j * dsize,0,0);
-		glColor3fv(p.color[i*3 + j]);
+		glColor3fv(p.color[(i+1)*3 + j+1]);
 		glVertex3f(-size, -size, size);
 		glVertex3f( size, -size, size);
 		glVertex3f( size,  size, size);
 		glVertex3f(-size,  size, size);
 		glPopMatrix();
 	}
-	glPopMatrix();
+	//glPopMatrix();
 	}
 	glEnd();
 }

@@ -69,7 +69,7 @@ void render_pieces(t_piece *p, float scale, float size) {
 }
 
 void render_piece(t_piece p, float scale, float size) {
-	float dsize = size * 2;
+	float dsize = size * 1.5;
 	glPushMatrix();
 	glScalef(scale, scale, scale);
 	glTranslatef(p.x * dsize, p.y * dsize, p.z * dsize);
