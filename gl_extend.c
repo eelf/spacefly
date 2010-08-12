@@ -1,3 +1,5 @@
+#include "gl_extend.h"
+
 void renderBitmapCharacher(float x, float y, float z, void *font, char *string) {
 	char *c;
 	glRasterPos3f(x, y, z);
@@ -5,4 +7,3 @@ void renderBitmapCharacher(float x, float y, float z, void *font, char *string) 
 		glutBitmapCharacter(font, *c);
 	}
 }
-

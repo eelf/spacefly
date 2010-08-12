@@ -10,7 +10,7 @@
 #include "cube.h"
 
 #include "data.c"
-#include "gl_extend.c"
+#include "gl_extend.h"
 
 
 t_camera camera;
@@ -24,8 +24,6 @@ t_color color[]= {
 	{ 1.0, 1.0, 1.0 }
 };
 char s[40];
-
-
 
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -107,13 +105,13 @@ void renderScene(void) {
 						color[F_Bottom][0] = 0.0; color[F_Bottom][1] = 0.0; color[F_Bottom][2] = 1.0; //синий
 						drawbox(&rube, color, F_Bottom);
 					}	
-					if (i==0) {
-						color[F_Left][0] = 1.0; color[F_Left][1] = 1.0; color[F_Left][2] = 0.0; //желтый
-						drawbox(&rube, color, F_Left);
-					}	
 					if (i==2) {
 						color[F_Right][0] = 1.0; color[F_Right][1] = 0.6; color[F_Right][2] = 0.0; //оранжевый
 						drawbox(&rube, color, F_Right);
+					}
+					if (i==0) {
+						color[F_Left][0] = 1.0; color[F_Left][1] = 1.0; color[F_Left][2] = 0.0; //желтый
+						drawbox(&rube, color, F_Left);
 					}	
 				}
 				glPopMatrix();
@@ -202,7 +200,7 @@ int main(int argc, char **argv) {
   	camera_init(&camera);
 	
 	//init other
-	rube = create_box(0.4, 0.4, 0.4);
+	rube = create_box(0.45, 0.45, 0.45);
 	
 	glutMainLoop();
 	// never happen lol

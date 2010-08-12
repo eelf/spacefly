@@ -8,11 +8,11 @@ float abssum(float a, float b) {
 }
 
 void camera_init(t_camera* camera) {
-	camera->x = 0.0;
-	camera->y = 0.0;
+	camera->x = 4.0;
+	camera->y = -4.0;
 	camera->z = -10.0;
-	camera->r = 0.0;
-	camera->q = 0.0;
+	camera->r = 30.0;
+	camera->q = 20.0;
 	
 	camera->vx = 0.0;
 	camera->vy = 0.0;
