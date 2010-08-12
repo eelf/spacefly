@@ -3,7 +3,7 @@ CCFLAGS = -Wall -g -std=c99
 LDFLAGS =
 OBJDIR = objs
 
-OBJECTS = helloworld.o piece.o camera.o side.o
+OBJECTS = helloworld.o piece.o camera.o side.o data.o cube.o
 
 OBJS = $(OBJECTS:%=$(OBJDIR)/%)
 SRCS = $(OBJECTS:%.o=%.c)

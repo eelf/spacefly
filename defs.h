@@ -7,3 +7,8 @@
 #include <GL/glu.h>
 #include <GL/glut.h> //!!! Not FreeGlut!! необходимо, что бы функционал везде совпдал
 #endif
+
+#ifndef PI
+#define PI 3.1415926
+#endif
+

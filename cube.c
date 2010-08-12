@@ -179,3 +179,57 @@ t_box create_box(float width, float height, float depth) {
 	
 	return b;
 }
+
+// translate in to C please
+// N = precision
+GLuint create_sphere(GLfloat radius, int n) {
+	GLuint result;
+	int i, j;
+	GLfloat theta1, theta2, theta3;
+	GLfloat x, y, z, px, py, pz;
+
+	result = glGenLists(1);
+	glNewList(result, GL_COMPILE);
+	if (radius < 0) radius = -radius;
+	if (n < 0) n = -n;
+	if ((n < 4) || (radius <= 0)) {
+		glBegin(GL_POINTS);
+		glVertex3f(0.0, 0.0, 0.0);
+		glEnd();
+		return result;
+	}
+
+	for (j = 0; j < n / 2 - 1; j++) {
+		theta1 = j * 2 * PI / n - PI / 2;
+		theta2 = (j + 1) * 2 * PI / n - PI / 2;
+		glBegin(GL_QUAD_STRIP);
+		for (i = 0; i < n; i++) {
+			theta3 = i * 2 * PI / n;
+			x = cos(theta2) * cos(theta3);
+			y = sin(theta2);
+			z = cos(theta2) * sin(theta3);
+			px = radius * x;
+			py = radius * y;
+			pz = radius * z;
+
+			glNormal3f(x, y, z);
+			glTexCoord2f(1 - i / n, 2 * (j + 1) / n);
+			glVertex3f(px, py, pz);
+
+			x = cos(theta1) * cos(theta3);
+			y = sin(theta1);
+			z = cos(theta1) * sin(theta3);
+			px = radius * x;
+			py = radius * y;
+			pz = radius * z;
+
+			glNormal3f(x, y, z);
+			glTexCoord2f(1 - i / n, 2 * j / n);
+			glVertex3f(px, py, pz);
+		}
+		glEnd();
+	}
+	glEndList();
+	return result;
+}
+
