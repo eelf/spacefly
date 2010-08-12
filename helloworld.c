@@ -14,10 +14,16 @@
 #define PDEB 10
 
 t_camera camera;
-unsigned int plane;
-unsigned int cube;
 
-int v = 0;
+t_box rube;
+t_color color[]= {
+	{ 1.0, 1.0, 1.0 },
+	{ 1.0, 1.0, 1.0 },
+	{ 1.0, 1.0, 1.0 },
+	{ 1.0, 1.0, 1.0 },
+	{ 1.0, 1.0, 1.0 },
+	{ 1.0, 1.0, 1.0 }
+};
 
 
 t_piece p[] = {
@@ -137,14 +143,40 @@ void renderScene(void) {
 			for (int k=0; k<3; k++) {
 				glPushMatrix();
 				glTranslatef(i-1, j-1, k-1); // -1 что бы 2.2.2 был в центре
-				if (i!=1 || j!=1 || k!=1)
-					draw(cube);
+				if (i!=1 || j!=1 || k!=1) {//не рисуем 2.2.2
+					glCallList(rube.ID); //рисуем грани кубиков
+					if (k==2) {
+						color[F_Front][0] = 1.0; color[F_Front][1] = 0.0; color[F_Front][2] = 0.0; //красная
+						drawbox(&rube, color, F_Front);
+					}
+					if (k==0) {
+						color[F_Back][0] = 1.0; color[F_Back][1] = 1.0; color[F_Back][2] = 1.0; //белая
+						drawbox(&rube, color, F_Back);
+					}
+					if (j==2) {
+						color[F_Top][0] = 0.0; color[F_Top][1] = 1.0; color[F_Top][2] = 0.0; //зеленый
+						drawbox(&rube, color, F_Top);
+					}
+					if (j==0) {
+						color[F_Bottom][0] = 0.0; color[F_Bottom][1] = 0.0; color[F_Bottom][2] = 1.0; //синий
+						drawbox(&rube, color, F_Bottom);
+					}	
+					if (i==0) {
+						color[F_Left][0] = 1.0; color[F_Left][1] = 1.0; color[F_Left][2] = 0.0; //желтый
+						drawbox(&rube, color, F_Left);
+					}	
+					if (i==2) {
+						color[F_Right][0] = 1.0; color[F_Right][1] = 0.6; color[F_Right][2] = 0.0; //оранжевый
+						drawbox(&rube, color, F_Right);
+					}	
+				}
 				glPopMatrix();
 			}
 		}
 	}
 	glPopMatrix();
 	glPopAttrib();
+ 
 	
 //	render_pieces(p, 0.5, 0.45);
 //	render_sides(p, 0.5, 0.45);
@@ -239,8 +271,7 @@ int main(int argc, char **argv) {
   	camera_init(&camera);
 	
 	//init other
-	plane = create_plane(1, 1);
-	cube = create_box(0.4, 0.4, 0.4);
+	rube = create_box(0.4, 0.4, 0.4);
 	
 	glutMainLoop();
 	return 0;
