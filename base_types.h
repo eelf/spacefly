@@ -3,5 +3,6 @@
 
 typedef float t_color[3];
 typedef float t_size[3];
+typedef float t_coord[3];
 
 #endif

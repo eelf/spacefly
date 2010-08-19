@@ -4,15 +4,16 @@ void draw(unsigned int ID) {
 	glCallList(ID);
 }
 
-void drawbox(t_box *box, t_color *color, int face) {
-	//glCallList(box->ID); //контур
-	
-	//for (int i=0; i<6; i++) {
-		glPushAttrib(GL_CURRENT_BIT);
-		glColor3fv(color[face]);
-		glCallList(box->planes[face]);
-		glPopAttrib();
-	//}
+void drawbox(t_box *box) {
+	glPushAttrib(GL_CURRENT_BIT);
+	glPushMatrix();
+	glTranslatef(box->coord[0], box->coord[1], box->coord[2]);
+	glColor3fv(box->color[0]);
+	for (int i=0; i<6; i++) {
+		glCallList(box->planes[i]);
+	}
+	glPopMatrix();
+	glPopAttrib();
 }
 
 unsigned int create_plane(float width, float height) {
@@ -26,7 +27,7 @@ unsigned int create_plane(float width, float height) {
 	
 	glPolygonMode(GL_BACK, GL_LINE);
 	//glFrontFace(GL_CCW);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	
 	glBegin(GL_QUADS);
 	glColor3f(0.5f, 0.5f, 0.5f);
@@ -41,63 +42,27 @@ unsigned int create_plane(float width, float height) {
 	return p.ID;
 }
 
-t_box create_box(float width, float height, float depth) {
+t_box create_box(float size, t_coord *coord, float color[6][3]) {
 	t_box b;
 	
-	b.width = width;
-	b.height = height;
-	b.depth = depth;
-	b.ID = glGenLists(1);
+	b.width = size;
+	b.height = size;
+	b.depth = size;
+	
+	b.coord[0] = (*coord)[0];
+	b.coord[1] = (*coord)[1];
+	b.coord[2] = (*coord)[2];
+	
+	for (int i=0; i<6; i++) { //ЧИНИТЬ НАДО
+		b.draw_plane[i] = TRUE;
+		b.color[i][0] = color[i][0];
+		b.color[i][1] = color[i][1];
+		b.color[i][2] = color[i][2];
+	}
 	
 	glEnable(GL_BLEND);
 	
-	glNewList(b.ID, GL_COMPILE);
-	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT, GL_LINE);
-	glColor3f(0, 0, 0);
-	glBegin(GL_QUADS);
-/*	// Front Face
-	glNormal3f(0.0, 0.0, 1.0);
-	glTexCoord2f(0.0, 0.0); glVertex3f(-b.width, -b.height,  b.depth);
-	glTexCoord2f(1.0, 0.0); glVertex3f( b.width, -b.height,  b.depth);
-	glTexCoord2f(1.0, 1.0); glVertex3f( b.width,  b.height,  b.depth);
-	glTexCoord2f(0.0, 1.0); glVertex3f(-b.width,  b.height,  b.depth);
-	// Back Face
-	glNormal3f(0.0, 0.0, -1.0);
-	glTexCoord2f(1.0, 0.0); glVertex3f(-b.width, -b.height, -b.depth);
-	glTexCoord2f(1.0, 1.0); glVertex3f(-b.width,  b.height, -b.depth);
-	glTexCoord2f(0.0, 1.0); glVertex3f( b.width,  b.height, -b.depth);
-	glTexCoord2f(0.0, 0.0); glVertex3f( b.width, -b.height, -b.depth);
-	// Top Face
-	glNormal3f(0.0, 1.0, 0.0);
-	glTexCoord2f(0.0, 1.0); glVertex3f(-b.width,  b.height, -b.depth);
-	glTexCoord2f(0.0, 0.0); glVertex3f(-b.width,  b.height,  b.depth);
-	glTexCoord2f(1.0, 0.0); glVertex3f( b.width,  b.height,  b.depth);
-	glTexCoord2f(1.0, 1.0); glVertex3f( b.width,  b.height, -b.depth);
-	// Bottom Face
-	glNormal3f(0.0, -1.0, 0.0);
-	glTexCoord2f(1.0, 1.0); glVertex3f(-b.width, -b.height, -b.depth);
-	glTexCoord2f(0.0, 1.0); glVertex3f( b.width, -b.height, -b.depth);
-	glTexCoord2f(0.0, 0.0); glVertex3f( b.width, -b.height,  b.depth);
-	glTexCoord2f(1.0, 0.0); glVertex3f(-b.width, -b.height,  b.depth);
-	// Right face
-	glNormal3f(1.0, 0.0, 0.0);
-	glTexCoord2f(1.0, 0.0); glVertex3f( b.width, -b.height, -b.depth);
-	glTexCoord2f(1.0, 1.0); glVertex3f( b.width,  b.height, -b.depth);
-	glTexCoord2f(0.0, 1.0); glVertex3f( b.width,  b.height,  b.depth);
-	glTexCoord2f(0.0, 0.0); glVertex3f( b.width, -b.height,  b.depth);
-	// Left Face
-	glNormal3f(-1.0, 0.0, 0.0);
-	glTexCoord2f(0.0, 0.0); glVertex3f(-b.width, -b.height, -b.depth);
-	glTexCoord2f(1.0, 0.0); glVertex3f(-b.width, -b.height,  b.depth);
-	glTexCoord2f(1.0, 1.0); glVertex3f(-b.width,  b.height,  b.depth);
-	glTexCoord2f(0.0, 1.0); glVertex3f(-b.width,  b.height, -b.depth);*/
-	glEnd();
-	glEndList(); //контур
-	
-	
-
-	
+// Front Plane
 	b.planes[0] = glGenLists(1);
 	glNewList(b.planes[0], GL_COMPILE);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -109,7 +74,7 @@ t_box create_box(float width, float height, float depth) {
 	glTexCoord2f(1.0, 1.0); glVertex3f( b.width,  b.height,  b.depth);
 	glTexCoord2f(0.0, 1.0); glVertex3f(-b.width,  b.height,  b.depth);
 	glEnd();
-	// Front Face Lines
+	// Front Face Border
 	glPushAttrib(GL_CURRENT_BIT);
 	glPolygonMode(GL_FRONT, GL_LINE);
 	glLineWidth(2);
@@ -124,6 +89,7 @@ t_box create_box(float width, float height, float depth) {
 	glPopAttrib();
 	glEndList();
 	
+// Back Plane
 	b.planes[1] = glGenLists(1);
 	glNewList(b.planes[1], GL_COMPILE);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -135,7 +101,7 @@ t_box create_box(float width, float height, float depth) {
 	glTexCoord2f(0.0, 1.0); glVertex3f( b.width,  b.height, -b.depth);
 	glTexCoord2f(0.0, 0.0); glVertex3f( b.width, -b.height, -b.depth);
 	glEnd();
-	// Back Face Lines
+	// Back Face Border
 	glPushAttrib(GL_CURRENT_BIT);
 	glPolygonMode(GL_FRONT, GL_LINE);
 	glLineWidth(2);
@@ -149,7 +115,8 @@ t_box create_box(float width, float height, float depth) {
 	glEnd();
 	glPopAttrib();
 	glEndList();
-	
+
+// Back Plane
 	b.planes[2] = glGenLists(1);
 	glNewList(b.planes[2], GL_COMPILE);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -161,7 +128,7 @@ t_box create_box(float width, float height, float depth) {
 	glTexCoord2f(1.0, 0.0); glVertex3f( b.width,  b.height,  b.depth);
 	glTexCoord2f(1.0, 1.0); glVertex3f( b.width,  b.height, -b.depth);
 	glEnd();
-	// Top Face Lines
+	// Top Face Border
 	glPushAttrib(GL_CURRENT_BIT);
 	glPolygonMode(GL_FRONT, GL_LINE);
 	glLineWidth(2);
@@ -176,6 +143,7 @@ t_box create_box(float width, float height, float depth) {
 	glPopAttrib();
 	glEndList();
 	
+// Bottom Plane
 	b.planes[3] = glGenLists(1);
 	glNewList(b.planes[3], GL_COMPILE);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -187,7 +155,7 @@ t_box create_box(float width, float height, float depth) {
 	glTexCoord2f(0.0, 0.0); glVertex3f( b.width, -b.height,  b.depth);
 	glTexCoord2f(1.0, 0.0); glVertex3f(-b.width, -b.height,  b.depth);
 	glEnd();
-	// Bottom Face Lines
+	// Bottom Face Border
 	glPushAttrib(GL_CURRENT_BIT);
 	glPolygonMode(GL_FRONT, GL_LINE);
 	glLineWidth(2);
@@ -202,6 +170,7 @@ t_box create_box(float width, float height, float depth) {
 	glPopAttrib();
 	glEndList();
 	
+// Right Plane
 	b.planes[4] = glGenLists(1);
 	glNewList(b.planes[4], GL_COMPILE);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -213,7 +182,7 @@ t_box create_box(float width, float height, float depth) {
 	glTexCoord2f(0.0, 1.0); glVertex3f( b.width,  b.height,  b.depth);
 	glTexCoord2f(0.0, 0.0); glVertex3f( b.width, -b.height,  b.depth);
 	glEnd();
-	// Right Face Lines
+	// Right Face Border
 	glPushAttrib(GL_CURRENT_BIT);
 	glPolygonMode(GL_FRONT, GL_LINE);
 	glLineWidth(2);
@@ -228,6 +197,7 @@ t_box create_box(float width, float height, float depth) {
 	glPopAttrib();
 	glEndList();
 	
+// Left Plane
 	b.planes[5] = glGenLists(1);
 	glNewList(b.planes[5], GL_COMPILE);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -239,7 +209,7 @@ t_box create_box(float width, float height, float depth) {
 	glTexCoord2f(1.0, 1.0); glVertex3f(-b.width,  b.height,  b.depth);
 	glTexCoord2f(0.0, 1.0); glVertex3f(-b.width,  b.height, -b.depth);
 	glEnd();
-	// Left Face Lines
+	// Left Face Border
 	glPushAttrib(GL_CURRENT_BIT);
 	glPolygonMode(GL_FRONT, GL_LINE);
 	glLineWidth(2);
@@ -253,6 +223,8 @@ t_box create_box(float width, float height, float depth) {
 	glEnd();
 	glPopAttrib();
 	glEndList();
+// end of planes
+	
 	glDisable(GL_BLEND);
 	
 	return b;

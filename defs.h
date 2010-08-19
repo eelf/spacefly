@@ -12,3 +12,8 @@
 #define PI 3.1415926
 #endif
 
+#ifndef BOOL
+#define TRUE 1
+#define FALSE 0
+#endif
+

@@ -15,14 +15,9 @@
 
 t_camera camera;
 t_box rube;
-t_color color[]= {
-	{ 1.0, 1.0, 1.0 },
-	{ 1.0, 1.0, 1.0 },
-	{ 1.0, 1.0, 1.0 },
-	{ 1.0, 1.0, 1.0 },
-	{ 1.0, 1.0, 1.0 },
-	{ 1.0, 1.0, 1.0 }
-};
+t_box cubic[28];
+t_color color[6];
+
 char s[40];
 
 void renderScene(void) {
@@ -77,54 +72,21 @@ void renderScene(void) {
  3.1.3	3.2.3	3.3.3
  
  2.2.2 - empty
+ 
+ 
+ i  -  0 // right - left
+ j  -  1 // top   - bottom
+ k  -  2 // front - back
+ 
  */
 	
 //draw scene
-	glPushAttrib(GL_CURRENT_BIT);
-	glPushMatrix();
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			for (int k = 0; k < 3; k++) {
-				glPushMatrix();
-				glTranslatef(i-1, j-1, k-1); // -1 что бы 2.2.2 был в центре
-				if (i!=1 || j!=1 || k!=1) {//не рисуем 2.2.2
-					glCallList(rube.ID); //рисуем грани кубиков
-					if (k==2) {
-						color[F_Front][0] = 1.0; color[F_Front][1] = 0.0; color[F_Front][2] = 0.0; //красная
-						drawbox(&rube, color, F_Front);
-					}
-					if (k==0) {
-						color[F_Back][0] = 1.0; color[F_Back][1] = 1.0; color[F_Back][2] = 1.0; //белая
-						drawbox(&rube, color, F_Back);
-					}
-					if (j==2) {
-						color[F_Top][0] = 0.0; color[F_Top][1] = 1.0; color[F_Top][2] = 0.0; //зеленый
-						drawbox(&rube, color, F_Top);
-					}
-					if (j==0) {
-						color[F_Bottom][0] = 0.0; color[F_Bottom][1] = 0.0; color[F_Bottom][2] = 1.0; //синий
-						drawbox(&rube, color, F_Bottom);
-					}	
-					if (i==2) {
-						color[F_Right][0] = 1.0; color[F_Right][1] = 0.6; color[F_Right][2] = 0.0; //оранжевый
-						drawbox(&rube, color, F_Right);
-					}
-					if (i==0) {
-						color[F_Left][0] = 1.0; color[F_Left][1] = 1.0; color[F_Left][2] = 0.0; //желтый
-						drawbox(&rube, color, F_Left);
-					}	
-				}
-				glPopMatrix();
-			}
-		}
+	for (int i = 0; i<27; i++) {
+		drawbox(&cubic[i]);
 	}
-	glPopMatrix();
-	glPopAttrib();
- 
 	
-//	render_pieces(p, 0.5, 0.45);
-//	render_sides(p, 0.5, 0.45);
-
+	
+	
 	glutSwapBuffers();
 	
 	camera_inert(&camera);
@@ -166,8 +128,8 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'q') camera_rotate(&camera, -4.0, 0.0);
 	if (key == 'z') camera_rotate(&camera,  4.0, 0.0);
 
-/*	if (key == 'u') rotate_pieces(0, (t_piece*)&p);
-	if (key == 'i') rotate_pieces(2, (t_piece*)&p);
+//	if (key == 'u') rotate_pieces(0, (t_piece*)&p);
+/*	if (key == 'i') rotate_pieces(2, (t_piece*)&p);
 	if (key == 'o') rotate_pieces(4, (t_piece*)&p);
 	if (key == 'j') rotate_pieces(1, (t_piece*)&p);
 	if (key == 'k') rotate_pieces(3, (t_piece*)&p);
@@ -175,6 +137,22 @@ void keyPressed(unsigned char key, int x, int y) {
 */
   	sprintf(s, "%c", key);
 	
+}
+
+t_coord *set_coord(float x, float y, float z) { //всё ли тут верно?
+	float Temp[3];
+	Temp[0] = (float)x;
+	Temp[1] = (float)y;
+	Temp[2] = (float)z;
+	return Temp;
+}
+
+t_color *set_color(float x, float y, float z) {
+	float Temp[3];
+	Temp[0] = (float)x;
+	Temp[1] = (float)y;
+	Temp[2] = (float)z;
+	return Temp;
 }
 
 int main(int argc, char **argv) {
@@ -200,7 +178,23 @@ int main(int argc, char **argv) {
   	camera_init(&camera);
 	
 	//init other
-	rube = create_box(0.45, 0.45, 0.45);
+	//rube = create_box(0.45, set_coord(0.0, 1.0, 1.0));
+	color[F_Front][0] = 1.0; color[F_Front][1] = 0.0; color[F_Front][2] = 0.0; //красная
+	color[F_Back][0] = 1.0; color[F_Back][1] = 1.0; color[F_Back][2] = 1.0; //белая
+	color[F_Top][0] = 0.0; color[F_Top][1] = 1.0; color[F_Top][2] = 0.0; //зеленый
+	color[F_Bottom][0] = 0.0; color[F_Bottom][1] = 0.0; color[F_Bottom][2] = 1.0; //синий
+	color[F_Right][0] = 1.0; color[F_Right][1] = 0.6; color[F_Right][2] = 0.0; //оранжевый
+	color[F_Left][0] = 1.0; color[F_Left][1] = 1.0; color[F_Left][2] = 0.0; //желтый
+	int n = 0;
+	for (int i = 0; i<3; i++) {
+		for (int j = 0; j<3; j++) {
+			for (int k = 0; k<3; k++) {
+				cubic[n] = create_box(0.45, set_coord(i-1, j-1, k-1), *color);
+				n++;
+			}
+		}
+	}
+
 	
 	glutMainLoop();
 	// never happen lol
