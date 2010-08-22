@@ -10,7 +10,8 @@ void drawbox(t_box *box) {
 	glTranslatef(box->coord[0], box->coord[1], box->coord[2]);
 	for (int i=0; i<6; i++) {
 		glColor3fv(box->color[i]);
-		glCallList(box->planes[i]);
+		if (box->draw_plane[i]==TRUE)
+			glCallList(box->planes[i]);
 	}
 	glPopMatrix();
 	glPopAttrib();
@@ -49,14 +50,27 @@ t_box create_box(float size, t_coord* coord, t_color_box* colors) {
 	b.height = size;
 	b.depth = size;
 	
-	b.coord[0] = (*coord)[0];
-	b.coord[1] = (*coord)[1];
-	b.coord[2] = (*coord)[2];
+	b.coord[0] = (*coord)[0]; // x
+	b.coord[1] = (*coord)[1]; // y
+	b.coord[2] = (*coord)[2]; // z
 	
-	for (int i = 0; i<6; i++) { //ЧИНИТЬ НАДО
-		b.draw_plane[i] = TRUE;
-	}
+	for (int i = 0; i<6; i++)
+		b.draw_plane[i] = FALSE;
 	
+	if (b.coord[2]==2)
+		b.draw_plane[F_Front] = TRUE;
+	if (b.coord[2]==0)
+		b.draw_plane[F_Back] = TRUE;
+	if (b.coord[1]==2)
+		b.draw_plane[F_Top] = TRUE;
+	if (b.coord[1]==0)
+		b.draw_plane[F_Bottom] = TRUE;
+	if (b.coord[0]==2)
+		b.draw_plane[F_Right] = TRUE;
+	if (b.coord[0]==0)
+		b.draw_plane[F_Left] = TRUE;
+	
+	// через жопу сделано, надо избавиться от t_color_box как от типа, при передаче цвета
 	for (int i = 0; i<3; i++) {
 		b.color[F_Front][i] = colors->front[i];
 		b.color[F_Back][i] = colors->back[i];

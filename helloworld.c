@@ -33,9 +33,9 @@ void renderScene(void) {
 	glTranslatef(camera.x, camera.y, camera.z);
 	
 	glBegin(GL_LINES);
-		glColor3f(1.0, 1.0, 0.0);
+		/*glColor3f(1.0, 1.0, 0.0);
 		glVertex3f(-camera.x + 1, -camera.y + 1, -camera.z + 1);
-		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(0.0, 0.0, 0.0);*/
 
 		glColor3f(0.0, 1.0, 0.0);
 		glVertex3f(0.0, 0.0, 0.0);
@@ -55,7 +55,7 @@ void renderScene(void) {
 	glPushAttrib(GL_CURRENT_BIT);
 		glColor3f(1.0, 1.0, 0.0); 
 		glPushMatrix();
-			renderBitmapCharacher(0, 1.8, 0, GLUT_BITMAP_8_BY_13, s);
+			renderBitmapCharacher(0, 3, 0, GLUT_BITMAP_8_BY_13, s);
 		glPopMatrix();
 	glPopAttrib();
 	
@@ -177,14 +177,6 @@ int main(int argc, char **argv) {
   	camera_init(&camera);
 	
 	//init other
-	//rube = create_box(0.45, set_coord(0.0, 1.0, 1.0));
-	/*color[F_Front][0] = 1.0; color[F_Front][1] = 0.0; color[F_Front][2] = 0.0; //красная
-	color[F_Back][0] = 1.0; color[F_Back][1] = 1.0; color[F_Back][2] = 1.0; //белая
-	color[F_Top][0] = 0.0; color[F_Top][1] = 1.0; color[F_Top][2] = 0.0; //зеленый
-	color[F_Bottom][0] = 0.0; color[F_Bottom][1] = 0.0; color[F_Bottom][2] = 1.0; //синий
-	color[F_Right][0] = 1.0; color[F_Right][1] = 0.6; color[F_Right][2] = 0.0; //оранжевый
-	color[F_Left][0] = 1.0; color[F_Left][1] = 1.0; color[F_Left][2] = 0.0; //желтый
-	 */
 	set_color(colors.front, 1.0, 0.0, 0.0); //красная
 	set_color(colors.back, 1.0, 1.0, 1.0); //белая
 	set_color(colors.top, 0.0, 1.0, 0.0); //зеленый
@@ -195,7 +187,7 @@ int main(int argc, char **argv) {
 	for (int i = 0; i<3; i++) {
 		for (int j = 0; j<3; j++) {
 			for (int k = 0; k<3; k++) {
-				cubic[n] = create_box(0.45, set_coord(i-1, j-1, k-1), &colors);
+				cubic[n] = create_box(0.45, set_coord(i, j, k), &colors);
 				n++;
 			}
 		}
