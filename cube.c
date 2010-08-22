@@ -8,8 +8,8 @@ void drawbox(t_box *box) {
 	glPushAttrib(GL_CURRENT_BIT);
 	glPushMatrix();
 	glTranslatef(box->coord[0], box->coord[1], box->coord[2]);
-	glColor3fv(box->color[0]);
 	for (int i=0; i<6; i++) {
+		glColor3fv(box->color[i]);
 		glCallList(box->planes[i]);
 	}
 	glPopMatrix();
@@ -42,7 +42,7 @@ unsigned int create_plane(float width, float height) {
 	return p.ID;
 }
 
-t_box create_box(float size, t_coord *coord, float color[6][3]) {
+t_box create_box(float size, t_coord* coord, t_color_box* colors) {
 	t_box b;
 	
 	b.width = size;
@@ -53,11 +53,17 @@ t_box create_box(float size, t_coord *coord, float color[6][3]) {
 	b.coord[1] = (*coord)[1];
 	b.coord[2] = (*coord)[2];
 	
-	for (int i=0; i<6; i++) { //ЧИНИТЬ НАДО
+	for (int i = 0; i<6; i++) { //ЧИНИТЬ НАДО
 		b.draw_plane[i] = TRUE;
-		b.color[i][0] = color[i][0];
-		b.color[i][1] = color[i][1];
-		b.color[i][2] = color[i][2];
+	}
+	
+	for (int i = 0; i<3; i++) {
+		b.color[F_Front][i] = colors->front[i];
+		b.color[F_Back][i] = colors->back[i];
+		b.color[F_Top][i] = colors->top[i];
+		b.color[F_Bottom][i] = colors->bottom[i];
+		b.color[F_Right][i] = colors->right[i];
+		b.color[F_Left][i] = colors->left[i];
 	}
 	
 	glEnable(GL_BLEND);

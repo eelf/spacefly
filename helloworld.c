@@ -16,7 +16,8 @@
 t_camera camera;
 t_box rube;
 t_box cubic[28];
-t_color color[6];
+float color[6][3];
+t_color_box colors;
 
 char s[40];
 
@@ -147,12 +148,10 @@ t_coord *set_coord(float x, float y, float z) { //всё ли тут верно?
 	return Temp;
 }
 
-t_color *set_color(float x, float y, float z) {
-	float Temp[3];
-	Temp[0] = (float)x;
-	Temp[1] = (float)y;
-	Temp[2] = (float)z;
-	return Temp;
+void set_color(t_color color, float x, float y, float z) {
+	color[0] = (float)x;
+	color[1] = (float)y;
+	color[2] = (float)z;
 }
 
 int main(int argc, char **argv) {
@@ -179,17 +178,24 @@ int main(int argc, char **argv) {
 	
 	//init other
 	//rube = create_box(0.45, set_coord(0.0, 1.0, 1.0));
-	color[F_Front][0] = 1.0; color[F_Front][1] = 0.0; color[F_Front][2] = 0.0; //красная
+	/*color[F_Front][0] = 1.0; color[F_Front][1] = 0.0; color[F_Front][2] = 0.0; //красная
 	color[F_Back][0] = 1.0; color[F_Back][1] = 1.0; color[F_Back][2] = 1.0; //белая
 	color[F_Top][0] = 0.0; color[F_Top][1] = 1.0; color[F_Top][2] = 0.0; //зеленый
 	color[F_Bottom][0] = 0.0; color[F_Bottom][1] = 0.0; color[F_Bottom][2] = 1.0; //синий
 	color[F_Right][0] = 1.0; color[F_Right][1] = 0.6; color[F_Right][2] = 0.0; //оранжевый
 	color[F_Left][0] = 1.0; color[F_Left][1] = 1.0; color[F_Left][2] = 0.0; //желтый
+	 */
+	set_color(colors.front, 1.0, 0.0, 0.0); //красная
+	set_color(colors.back, 1.0, 1.0, 1.0); //белая
+	set_color(colors.top, 0.0, 1.0, 0.0); //зеленый
+	set_color(colors.bottom, 0.0, 0.0, 1.0); //синий
+	set_color(colors.right, 1.0, 0.6, 0.0); //оранжевый
+	set_color(colors.left, 1.0, 1.0, 0.0); //желтый
 	int n = 0;
 	for (int i = 0; i<3; i++) {
 		for (int j = 0; j<3; j++) {
 			for (int k = 0; k<3; k++) {
-				cubic[n] = create_box(0.45, set_coord(i-1, j-1, k-1), *color);
+				cubic[n] = create_box(0.45, set_coord(i-1, j-1, k-1), &colors);
 				n++;
 			}
 		}

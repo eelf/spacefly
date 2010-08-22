@@ -19,10 +19,20 @@ typedef struct {
 } t_plane;
 
 typedef struct {
+	t_color front;
+	t_color back;
+	t_color top;
+	t_color bottom;
+	t_color right;
+	t_color left;
+} t_color_box;
+
+typedef struct {
 	float width, height, depth;
 	t_coord coord;
 	int planes[6];
 	unsigned int draw_plane[6];
+	t_color_box colors;
 	t_color color[6];
 } t_box;
 
@@ -33,7 +43,7 @@ typedef struct {
 void draw(unsigned int ID);
 void drawbox(t_box *box);
 unsigned int create_plane(float width, float height);
-t_box create_box(float size, t_coord *coord, float color[6][3]);
+t_box create_box(float size, t_coord *coord, t_color_box* colors);
 
 GLuint create_sphere(GLfloat radius, int n);
 
