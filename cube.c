@@ -1,5 +1,40 @@
 #include "cube.h"
 
+t_stack create_stack() {
+
+}
+
+void stack_add(t_stack *stack, t_box *box, int face) {
+	/*int *a, n, i;
+	 scanf("%d", &n);
+	 a = malloc(n*sizeof(int));
+	 // далее работаем как с массивом, например:
+	 for (i=0; i <n; i++) {
+     a[i]=0;
+	 } // for
+	 .............................................
+	 free(a); // когда станет не нужно
+	 */
+	stack->n++;
+	//stack->planes = malloc(stack->n * sizeof(int));
+	stack->planes[stack->n-1] = box->planes[face];
+	stack->color[stack->n-1][0] = box->color[face][0];
+	stack->color[stack->n-1][1] = box->color[face][1];
+	stack->color[stack->n-1][2] = box->color[face][2];
+	stack->coord[stack->n-1][0] = box->coord[0];
+	stack->coord[stack->n-1][1] = box->coord[1];
+	stack->coord[stack->n-1][2] = box->coord[2];
+}
+
+unsigned int* stack_get(t_stack *stack) {
+	return stack->planes;
+	free(stack->planes);
+}
+
+unsigned int stack_get_n(t_stack *stack) {
+	return stack->n;
+}
+
 void draw(unsigned int ID) {
 	glCallList(ID);
 }
@@ -17,30 +52,28 @@ void drawbox(t_box *box) {
 	glPopAttrib();
 }
 
-unsigned int create_plane(float width, float height) {
-	t_plane p;
+void draw_stack(t_stack *stack) {
 	
-	p.width = width;
-	p.height = height;
-	p.ID = glGenLists(1);
-	
-	glNewList(p.ID, GL_COMPILE);
-	
-	glPolygonMode(GL_BACK, GL_LINE);
-	//glFrontFace(GL_CCW);
-	glEnable(GL_CULL_FACE);
-	
-	glBegin(GL_QUADS);
-	glColor3f(0.5f, 0.5f, 0.5f);
-	glNormal3f(0.0, 1.0, 0.0);
-	glTexCoord2f(0,1); glVertex2f(-p.width/2, -p.height/2);
-	glTexCoord2f(1,1); glVertex2f( p.width/2, -p.height/2);
-	glTexCoord2f(1,0); glVertex2f( p.width/2,  p.height/2);
-	glTexCoord2f(0,0); glVertex2f(-p.width/2,  p.height/2);
-	glEnd();
-	glEndList();
-	
-	return p.ID;
+	glPushAttrib(GL_CURRENT_BIT);
+	glPushMatrix();
+	glRotatef(90, 1, 0, 0);
+	for (int i=0; i<stack->n; i++) {
+		glPushMatrix();
+		glTranslatef(stack->coord[i][0], stack->coord[i][1], stack->coord[i][2]);
+		glColor3fv(stack->color[i]);
+		//if (box->draw_plane[i]==TRUE)
+		glCallList(stack->planes[i]);
+		glPopMatrix();
+	}
+	glPopMatrix();
+	glPopAttrib();
+}
+
+void draw_plane_off(t_box *box, t_stack *stack, int face) {
+	if (box->draw_plane[face] != FALSE) {
+		box->draw_plane[face] = FALSE;
+		stack_add(stack, box, face);
+	}
 }
 
 t_box create_box(float size, t_coord* coord, t_color_box* colors) {
@@ -57,17 +90,17 @@ t_box create_box(float size, t_coord* coord, t_color_box* colors) {
 	for (int i = 0; i<6; i++)
 		b.draw_plane[i] = FALSE;
 	
-	if (b.coord[2]==2)
+	if (b.coord[2]==1)
 		b.draw_plane[F_Front] = TRUE;
-	if (b.coord[2]==0)
+	if (b.coord[2]==-1)
 		b.draw_plane[F_Back] = TRUE;
-	if (b.coord[1]==2)
+	if (b.coord[1]==1)
 		b.draw_plane[F_Top] = TRUE;
-	if (b.coord[1]==0)
+	if (b.coord[1]==-1)
 		b.draw_plane[F_Bottom] = TRUE;
-	if (b.coord[0]==2)
+	if (b.coord[0]==1)
 		b.draw_plane[F_Right] = TRUE;
-	if (b.coord[0]==0)
+	if (b.coord[0]==-1)
 		b.draw_plane[F_Left] = TRUE;
 	
 	// через жопу сделано, надо избавиться от t_color_box как от типа, при передаче цвета

@@ -16,8 +16,9 @@
 t_camera camera;
 t_box rube;
 t_box cubic[28];
-float color[6][3];
+t_stack stack;
 t_color_box colors;
+unsigned int number_of_planes;
 
 char s[40];
 
@@ -85,13 +86,16 @@ void renderScene(void) {
 	for (int i = 0; i<27; i++) {
 		drawbox(&cubic[i]);
 	}
-	
-	
+	//for (int i = 0; i<number_of_planes; i++) {
+	//	draw
+	//}
+	draw_stack(&stack);
 	
 	glutSwapBuffers();
 	
 	camera_inert(&camera);
 }
+
 
 
 void changeSize(int w, int h) {
@@ -129,7 +133,19 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'q') camera_rotate(&camera, -4.0, 0.0);
 	if (key == 'z') camera_rotate(&camera,  4.0, 0.0);
 
-//	if (key == 'u') rotate_pieces(0, (t_piece*)&p);
+	if (key == 'u') {
+		for (int i=0; i<27; i++) {
+			//выключили один край
+			if (cubic[i].coord[0]==-1) {
+				draw_plane_off(&cubic[i], &stack, F_Top);
+				draw_plane_off(&cubic[i], &stack, F_Front);
+				draw_plane_off(&cubic[i], &stack, F_Back);
+				draw_plane_off(&cubic[i], &stack, F_Bottom);
+			}
+			draw_plane_off(&cubic[i], &stack, F_Left);
+		}
+		number_of_planes = stack_get_n(&stack);
+	}
 /*	if (key == 'i') rotate_pieces(2, (t_piece*)&p);
 	if (key == 'o') rotate_pieces(4, (t_piece*)&p);
 	if (key == 'j') rotate_pieces(1, (t_piece*)&p);
@@ -177,6 +193,7 @@ int main(int argc, char **argv) {
   	camera_init(&camera);
 	
 	//init other
+	stack.n = 0;
 	set_color(colors.front, 1.0, 0.0, 0.0); //красная
 	set_color(colors.back, 1.0, 1.0, 1.0); //белая
 	set_color(colors.top, 0.0, 1.0, 0.0); //зеленый
@@ -187,7 +204,7 @@ int main(int argc, char **argv) {
 	for (int i = 0; i<3; i++) {
 		for (int j = 0; j<3; j++) {
 			for (int k = 0; k<3; k++) {
-				cubic[n] = create_box(0.45, set_coord(i, j, k), &colors);
+				cubic[n] = create_box(0.45, set_coord(i-1, j-1, k-1), &colors);
 				n++;
 			}
 		}

@@ -13,12 +13,6 @@
 #define F_Left 5
 
 typedef struct {
-	unsigned int ID;
-	float width, height, depth;
-	t_color color;
-} t_plane;
-
-typedef struct {
 	t_color front;
 	t_color back;
 	t_color top;
@@ -26,6 +20,13 @@ typedef struct {
 	t_color right;
 	t_color left;
 } t_color_box;
+
+typedef struct {
+	unsigned int n; //count
+	int planes[512];
+	t_color color[512];
+	t_coord coord[512];
+} t_stack;
 
 typedef struct {
 	float width, height, depth;
@@ -36,13 +37,15 @@ typedef struct {
 	t_color color[6];
 } t_box;
 
-typedef struct {
-	
-} t_rube;
+t_stack create_stack();
+void stack_add(t_stack *stack, t_box *box, int face);
+unsigned int* stack_get(t_stack *stack);
+unsigned int stack_get_n(t_stack *stack);
+void draw_stack(t_stack *stack);
 
 void draw(unsigned int ID);
 void drawbox(t_box *box);
-unsigned int create_plane(float width, float height);
+void draw_plane_off(t_box *box, t_stack *stack, int face);
 t_box create_box(float size, t_coord *coord, t_color_box* colors);
 
 GLuint create_sphere(GLfloat radius, int n);
