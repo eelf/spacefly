@@ -19,8 +19,17 @@ t_box cubic[28];
 t_stack stack;
 t_color_box colors;
 unsigned int number_of_planes;
+float angle;
 
 char s[40];
+
+void timer(int value) // Timer function
+{
+	if (angle!=90) {
+		angle+=0.5;
+		glutTimerFunc(3, timer, 0); // Setup next timer
+	} 
+}
 
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -89,7 +98,7 @@ void renderScene(void) {
 	//for (int i = 0; i<number_of_planes; i++) {
 	//	draw
 	//}
-	draw_stack(&stack);
+	draw_stack(&stack, angle);
 	
 	glutSwapBuffers();
 	
@@ -145,6 +154,7 @@ void keyPressed(unsigned char key, int x, int y) {
 			draw_plane_off(&cubic[i], &stack, F_Left);
 		}
 		number_of_planes = stack_get_n(&stack);
+		glutTimerFunc(20, timer, 0);
 	}
 /*	if (key == 'i') rotate_pieces(2, (t_piece*)&p);
 	if (key == 'o') rotate_pieces(4, (t_piece*)&p);
@@ -193,6 +203,7 @@ int main(int argc, char **argv) {
   	camera_init(&camera);
 	
 	//init other
+	angle = 0;
 	stack.n = 0;
 	set_color(colors.front, 1.0, 0.0, 0.0); //красная
 	set_color(colors.back, 1.0, 1.0, 1.0); //белая

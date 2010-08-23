@@ -41,7 +41,7 @@ t_stack create_stack();
 void stack_add(t_stack *stack, t_box *box, int face);
 unsigned int* stack_get(t_stack *stack);
 unsigned int stack_get_n(t_stack *stack);
-void draw_stack(t_stack *stack);
+void draw_stack(t_stack *stack, float angle);
 
 void draw(unsigned int ID);
 void drawbox(t_box *box);

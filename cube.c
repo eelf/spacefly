@@ -45,18 +45,21 @@ void drawbox(t_box *box) {
 	glTranslatef(box->coord[0], box->coord[1], box->coord[2]);
 	for (int i=0; i<6; i++) {
 		glColor3fv(box->color[i]);
-		if (box->draw_plane[i]==TRUE)
+		if (box->draw_plane[i]==TRUE) //статическое рисование
 			glCallList(box->planes[i]);
+		else { //рисование поворота
+			
+		}
+
 	}
 	glPopMatrix();
 	glPopAttrib();
 }
 
-void draw_stack(t_stack *stack) {
-	
+void draw_stack(t_stack *stack, float angle) {
 	glPushAttrib(GL_CURRENT_BIT);
 	glPushMatrix();
-	glRotatef(90, 1, 0, 0);
+	glRotatef(angle, 1, 0, 0);
 	for (int i=0; i<stack->n; i++) {
 		glPushMatrix();
 		glTranslatef(stack->coord[i][0], stack->coord[i][1], stack->coord[i][2]);
