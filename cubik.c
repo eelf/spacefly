@@ -2,34 +2,30 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "helloworld.h"
 #include "defs.h"
-//#include "piece.h"
-//#include "side.h"
+#include "side.h"
 #include "camera.h"
-#include "cube.h"
 
-#include "data.c"
 #include "gl_extend.h"
 
 
 t_camera camera;
-t_box rube;
-t_box cubic[28];
-t_stack stack;
-t_color_box colors;
-unsigned int number_of_planes;
-float angle;
-
+t_cube cube;
 char s[40];
+float angle;
+char rotation;
 
-void timer(int value) // Timer function
-{
-	if (angle!=90) {
-		angle+=0.5;
-		glutTimerFunc(3, timer, 0); // Setup next timer
-	} 
+void timer(int value) {
+	if (rotation && angle < 90.0) {
+		angle += 0.5;
+		glutTimerFunc(50, timer, 0); // Setup next timer
+	} else {
+		rotation = 0;
+		// rotation done, swap planes, reset plane rotation state
+		angle = 0.0;
+	}
 }
+
 
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -61,6 +57,7 @@ void renderScene(void) {
 	glEnd();
 	
 //draw text
+/*
 	sprintf(s, "%.2f %.2f %.2f", camera.x, camera.y, camera.z);
 	glPushAttrib(GL_CURRENT_BIT);
 		glColor3f(1.0, 1.0, 0.0); 
@@ -68,18 +65,11 @@ void renderScene(void) {
 			renderBitmapCharacher(0, 3, 0, GLUT_BITMAP_8_BY_13, s);
 		glPopMatrix();
 	glPopAttrib();
-	
+	*/
 
 	
 //draw scene
-	for (int i = 0; i<27; i++) {
-		drawbox(&cubic[i]);
-	}
-	//for (int i = 0; i<number_of_planes; i++) {
-	//	draw
-	//}
-	draw_stack(&stack, angle);
-	
+	render_cube(&cube);
 	glutSwapBuffers();
 	
 	camera_inert(&camera);
@@ -123,44 +113,27 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'z') camera_rotate(&camera,  4.0, 0.0);
 
 	if (key == 'u') {
-		for (int i=0; i<27; i++) {
-			//выключили один край
-			if (cubic[i].coord[0]==-1) {
-				draw_plane_off(&cubic[i], &stack, F_Top);
-				draw_plane_off(&cubic[i], &stack, F_Front);
-				draw_plane_off(&cubic[i], &stack, F_Back);
-				draw_plane_off(&cubic[i], &stack, F_Bottom);
-			}
-			draw_plane_off(&cubic[i], &stack, F_Left);
-		}
-		number_of_planes = stack_get_n(&stack);
-		glutTimerFunc(20, timer, 0);
+		rotation = 1;
+		rotate_sides(&cube, RX, 0);
+		glutTimerFunc(50, timer, 0);
 	}
-/*	if (key == 'i') rotate_pieces(2, (t_piece*)&p);
-	if (key == 'o') rotate_pieces(4, (t_piece*)&p);
-	if (key == 'j') rotate_pieces(1, (t_piece*)&p);
-	if (key == 'k') rotate_pieces(3, (t_piece*)&p);
-	if (key == 'l') rotate_pieces(5, (t_piece*)&p);
-*/
-  	sprintf(s, "%c", key);
+	if (key == 'i') {
+		rotation = 1;
+		rotate_sides(&cube, RX, 1);
+		glutTimerFunc(50, timer, 0);
+	}
+	if (key == 'o') {
+		rotation = 1;
+		rotate_sides(&cube, RX, 2);
+		glutTimerFunc(50, timer, 0);
+	}
 	
 }
 
-t_coord *set_coord(float x, float y, float z) { //всё ли тут верно?
-	float Temp[3];
-	Temp[0] = (float)x;
-	Temp[1] = (float)y;
-	Temp[2] = (float)z;
-	return Temp;
-}
-
-void set_color(t_color color, float x, float y, float z) {
-	color[0] = (float)x;
-	color[1] = (float)y;
-	color[2] = (float)z;
-}
 
 int main(int argc, char **argv) {
+//	printf("%d %d %d %d %d %d \n", sizeof(t_cube), sizeof(t_plane), sizeof(t_color), sizeof(t_direction), sizeof(t_rotation), sizeof(t_rotation_direction));
+	
 	glutInit(&argc, argv);
 	
 	// This is where we say that we want a double buffer
@@ -180,28 +153,12 @@ int main(int argc, char **argv) {
 	// enable depth testing
 	glEnable(GL_DEPTH_TEST);
   	sprintf(s, "%c", 65);
+  	rotation = 0;
   	camera_init(&camera);
 	
 	//init other
-	angle = 0;
-	stack.n = 0;
-	set_color(colors.front, 1.0, 0.0, 0.0); //красная
-	set_color(colors.back, 1.0, 1.0, 1.0); //белая
-	set_color(colors.top, 0.0, 1.0, 0.0); //зеленый
-	set_color(colors.bottom, 0.0, 0.0, 1.0); //синий
-	set_color(colors.right, 1.0, 0.6, 0.0); //оранжевый
-	set_color(colors.left, 1.0, 1.0, 0.0); //желтый
-	int n = 0;
-	for (int i = 0; i<3; i++) {
-		for (int j = 0; j<3; j++) {
-			for (int k = 0; k<3; k++) {
-				cubic[n] = create_box(0.45, set_coord(i-1, j-1, k-1), &colors);
-				n++;
-			}
-		}
-	}
+	create_cube(&cube);
 
-	
 	glutMainLoop();
 	// never happen lol
 	return 0;

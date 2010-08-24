@@ -3,10 +3,14 @@ CCFLAGS = -Wall -g -std=c99
 LDFLAGS =
 OBJDIR = objs
 
-OBJECTS = helloworld.o piece.o camera.o side.o data.o cube.o
+TARGET = cubik
+MODULES = $(TARGET) piece camera side data gl_extend
+#MODULES += cube
 
-OBJS = $(OBJECTS:%=$(OBJDIR)/%)
-SRCS = $(OBJECTS:%.o=%.c)
+
+
+OBJS = $(MODULES:%=$(OBJDIR)/%.o)
+SRCS = $(MODULES:%=%.c)
 
 ifndef OSTYPE
   OSTYPE = $(shell uname -s|awk '{print tolower($$0)}')
@@ -25,14 +29,14 @@ $(OBJDIR)/%.o: %.c
 	if [ ! -d "$(OBJDIR)" ]; then mkdir $(OBJDIR); fi
 	$(CC) $(CCFLAGS) -c $< -o $@
 
-helloworld: $(OBJS)
+$(TARGET): $(OBJS)
 	$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:
 	rm $(OBJDIR)/*
 
-run: helloworld
-	./helloworld
+run: $(TARGET)
+	./$(TARGET)
 
-all: helloworld
+all: $(TARGET)
 

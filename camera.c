@@ -43,11 +43,11 @@ void camera_inert(t_camera* camera) {
 }
 // forward upward right
 void camera_move(t_camera* camera, float f, float u, float r) {
-	float sinr = sin(camera->r * M_PI_DIV_180);
-	float cosr = cos(camera->r * M_PI_DIV_180);
+//	float sinr = sin(camera->r * M_PI_DIV_180);
+//	float cosr = cos(camera->r * M_PI_DIV_180);
 	
-	float cosq = cos(camera->q * M_PI_DIV_180);
-	float sinq = sin(camera->q * M_PI_DIV_180);
+//	float cosq = cos(camera->q * M_PI_DIV_180);
+//	float sinq = sin(camera->q * M_PI_DIV_180);
 	
 
 	camera->vx += ( r ) * 0.01;
