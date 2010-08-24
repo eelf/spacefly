@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "defs.h"
-
+#include "gl_extend.h"
 #include "side.h"
 
 
@@ -124,7 +124,7 @@ void cube_end_rotate(t_cube* cube) {
 				(*cube)[i].dir = ZA;
 				tmp = (*cube)[i].col;
 				(*cube)[i].col = (*cube)[i].row;
-				(*cube)[i].row = tmp;
+				(*cube)[i].row = 2 - tmp;
 			} else if ((*cube)[i].dir == ZA) {
 				(*cube)[i].dir = YB;
 				tmp = (*cube)[i].row;
@@ -134,7 +134,7 @@ void cube_end_rotate(t_cube* cube) {
 				(*cube)[i].dir = ZB;
 				tmp = (*cube)[i].col;
 				(*cube)[i].col = (*cube)[i].row;
-				(*cube)[i].row = tmp;
+				(*cube)[i].row = 2 - tmp;
 			} else if ((*cube)[i].dir == ZB) {
 				(*cube)[i].dir = YA;
 				tmp = (*cube)[i].row;
@@ -148,21 +148,33 @@ void cube_end_rotate(t_cube* cube) {
 			(*cube)[i].row = (*cube)[i].col;
 			(*cube)[i].col = 2 - tmp;
 			}
-			if ((*cube)[i].dir == XA) (*cube)[i].dir = ZB;
-			else if ((*cube)[i].dir == ZA) (*cube)[i].dir = XA;
-			else if ((*cube)[i].dir == XB) (*cube)[i].dir = ZA;
-			else if ((*cube)[i].dir == ZB) (*cube)[i].dir = XB;
+			if ((*cube)[i].dir == XA) {
+				(*cube)[i].dir = ZB;
+			} else if ((*cube)[i].dir == ZA) {
+				(*cube)[i].dir = XA;
+				(*cube)[i].col = 2 - (*cube)[i].col;
+			} else if ((*cube)[i].dir == XB) (*cube)[i].dir = ZA;
+			else if ((*cube)[i].dir == ZB) {
+				(*cube)[i].dir = XB;
+				(*cube)[i].col = 2 - (*cube)[i].col;
+			}
 		break;
 		case RZ:
 			if ((*cube)[i].dir == ZA || (*cube)[i].dir == ZB) {
-			tmp = (*cube)[i].row;
-			(*cube)[i].row = (*cube)[i].col;
-			(*cube)[i].col = 2 - tmp;
+				tmp = (*cube)[i].row;
+				(*cube)[i].row = (*cube)[i].col;
+				(*cube)[i].col = 2 - tmp;
 			}
-			if ((*cube)[i].dir == YA) (*cube)[i].dir = XB;
-			else if ((*cube)[i].dir == XA) (*cube)[i].dir = YA;
-			else if ((*cube)[i].dir == YB) (*cube)[i].dir = XA;
-			else if ((*cube)[i].dir == XB) (*cube)[i].dir = YB;
+			if ((*cube)[i].dir == YA) {
+				(*cube)[i].dir = XB;
+			} else if ((*cube)[i].dir == XA) {
+				(*cube)[i].dir = YA;
+				(*cube)[i].row = 2 - (*cube)[i].row;
+			} else if ((*cube)[i].dir == YB) (*cube)[i].dir = XA;
+			else if ((*cube)[i].dir == XB) {
+				(*cube)[i].dir = YB;
+				(*cube)[i].row = 2 - (*cube)[i].row;
+			}
 		break;
 		}
 		
@@ -171,7 +183,7 @@ void cube_end_rotate(t_cube* cube) {
 }
 
 void plane_render(t_plane *plane) {
-	float s = 0.45;
+	float s = 0.5;
 	float t = 1.0;
 	/*
 	static float i = 1.0;

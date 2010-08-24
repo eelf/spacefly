@@ -17,9 +17,10 @@ char rotation;
 
 void timer(int value) {
 	if (rotation && angle < 90.0) {
-		if (angle < 10.0) angle += 4.0;
-		else if (angle < 70.0) angle += 10.0;
-		else angle += 1.0;
+//		if (angle < 10.0) angle += 4.0;
+//		else if (angle < 70.0) 
+		angle += 10.0;
+//		else angle += 1.0;
 		glutTimerFunc(50, timer, 0); // Setup next timer
 	} else {
 		rotation = 0;
@@ -163,7 +164,7 @@ void keyPressed(unsigned char key, int x, int y) {
 		glutTimerFunc(50, timer, 0);
 	}
 	}
-	
+		
 }
 
 
