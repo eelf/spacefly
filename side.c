@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "defs.h"
-#include "data.c"
 
 #include "side.h"
 
@@ -12,8 +11,17 @@ t_color color_white = {1.0, 1.0, 1.0};
 t_color color_yellow = {1.0, 1.0, 0.0};
 t_color color_magenta = {1.0, 0.0, 1.0};
 
+extern float angle;
 
-void create_cube(t_cube *cube) {
+
+void copy_color(t_color *a, t_color *b) {
+	(*a)[0] = (*b)[0];
+	(*a)[1] = (*b)[1];
+	(*a)[2] = (*b)[2];
+}
+
+
+void cube_init(t_cube *cube) {
 
 	int row = 0, col = 0, dir = 0;
 	for(int i = 0; i < 6 * 9; i++) {
@@ -55,42 +63,114 @@ void create_cube(t_cube *cube) {
 }
 
 
-void copy_color(t_color *a, t_color *b) {
-	(*a)[0] = (*b)[0];
-	(*a)[1] = (*b)[1];
-	(*a)[2] = (*b)[2];
-}
-
-void rotate_sides(t_cube* cube, t_rotation_direction rdir, unsigned char row) {
+void cube_rotate(t_cube* cube, t_rotation_direction rdir, unsigned char row) {
 	
 	for(int i = 0; i < 54; i++) {
 	switch (rdir) {
 	case RX:
-	if ((*cube)[i].dir == YA && (*cube)[i].row == row) (*cube)[i].rot.rdir = RX;
-	if ((*cube)[i].dir == YB && (*cube)[i].row == row) (*cube)[i].rot.rdir = RX;
-	if ((*cube)[i].dir == ZA && (*cube)[i].col == row) (*cube)[i].rot.rdir = RX;
-	if ((*cube)[i].dir == ZB && (*cube)[i].col == row) (*cube)[i].rot.rdir = RX;
+		if ((*cube)[i].dir == YA && (*cube)[i].row == row) (*cube)[i].rot.rdir = RX;
+		if ((*cube)[i].dir == YB && (*cube)[i].row == row) (*cube)[i].rot.rdir = RX;
+		if ((*cube)[i].dir == ZA && (*cube)[i].col == row) (*cube)[i].rot.rdir = RX;
+		if ((*cube)[i].dir == ZB && (*cube)[i].col == row) (*cube)[i].rot.rdir = RX;
 
-	if (row == 0 && (*cube)[i].dir == XB) (*cube)[i].rot.rdir = RX;
-	if (row == 2 && (*cube)[i].dir == XA) (*cube)[i].rot.rdir = RX;
+		if (row == 0 && (*cube)[i].dir == XB) (*cube)[i].rot.rdir = RX;
+		if (row == 2 && (*cube)[i].dir == XA) (*cube)[i].rot.rdir = RX;
+	break;
+	case RY:
+		if ((*cube)[i].dir == XA && (*cube)[i].row == row) (*cube)[i].rot.rdir = RY;
+		if ((*cube)[i].dir == XB && (*cube)[i].row == row) (*cube)[i].rot.rdir = RY;
+		if ((*cube)[i].dir == ZA && (*cube)[i].row == row) (*cube)[i].rot.rdir = RY;
+		if ((*cube)[i].dir == ZB && (*cube)[i].row == row) (*cube)[i].rot.rdir = RY;
+
+		if (row == 0 && (*cube)[i].dir == YB) (*cube)[i].rot.rdir = RY;
+		if (row == 2 && (*cube)[i].dir == YA) (*cube)[i].rot.rdir = RY;
+	break;
+	case RZ:
+		if ((*cube)[i].dir == YA && (*cube)[i].col == row) (*cube)[i].rot.rdir = RZ;
+		if ((*cube)[i].dir == YB && (*cube)[i].col == row) (*cube)[i].rot.rdir = RZ;
+		if ((*cube)[i].dir == XA && (*cube)[i].col == row) (*cube)[i].rot.rdir = RZ;
+		if ((*cube)[i].dir == XB && (*cube)[i].col == row) (*cube)[i].rot.rdir = RZ;
+
+		if (row == 0 && (*cube)[i].dir == ZB) (*cube)[i].rot.rdir = RZ;
+		if (row == 2 && (*cube)[i].dir == ZA) (*cube)[i].rot.rdir = RZ;
+	break;
 	}
 		
 	}
 }
 
 
-void render_cube(t_cube *cube) {
-	for(int i = 0; i < 54; i++) {
-		glPushMatrix();
-		render_plane(&(*cube)[i]);
-		glPopMatrix();
-	}
+/*
+00 01 02	02 12 22
+10 11 12	01 11 21
+20 21 22    00 10 20
 
+00 - 20, 01 - 10, 02 - 00
+10 - 21, 11 - 11, 12 - 01
+20 - 22, 21 - 12, 22 - 02
+*/
+void cube_end_rotate(t_cube* cube) {
+	int tmp;
+	for(int i = 0; i < 54; i++) {
+	
+		switch((*cube)[i].rot.rdir) {
+		case RX:
+			if ((*cube)[i].dir == XA || (*cube)[i].dir == XB) {
+			tmp = (*cube)[i].col;
+			(*cube)[i].col = (*cube)[i].row;
+			(*cube)[i].row = 2 - tmp;
+			}
+			if ((*cube)[i].dir == YA) {
+				(*cube)[i].dir = ZA;
+				tmp = (*cube)[i].col;
+				(*cube)[i].col = (*cube)[i].row;
+				(*cube)[i].row = tmp;
+			} else if ((*cube)[i].dir == ZA) {
+				(*cube)[i].dir = YB;
+				tmp = (*cube)[i].row;
+				(*cube)[i].row = (*cube)[i].col;
+				(*cube)[i].col = tmp;
+			} else if ((*cube)[i].dir == YB) {
+				(*cube)[i].dir = ZB;
+				tmp = (*cube)[i].col;
+				(*cube)[i].col = (*cube)[i].row;
+				(*cube)[i].row = tmp;
+			} else if ((*cube)[i].dir == ZB) {
+				(*cube)[i].dir = YA;
+				tmp = (*cube)[i].row;
+				(*cube)[i].row = (*cube)[i].col;
+				(*cube)[i].col = tmp;
+			}
+		break;
+		case RY:
+			if ((*cube)[i].dir == YA || (*cube)[i].dir == YB) {
+			tmp = (*cube)[i].row;
+			(*cube)[i].row = (*cube)[i].col;
+			(*cube)[i].col = 2 - tmp;
+			}
+			if ((*cube)[i].dir == XA) (*cube)[i].dir = ZB;
+			else if ((*cube)[i].dir == ZA) (*cube)[i].dir = XA;
+			else if ((*cube)[i].dir == XB) (*cube)[i].dir = ZA;
+			else if ((*cube)[i].dir == ZB) (*cube)[i].dir = XB;
+		break;
+		case RZ:
+			if ((*cube)[i].dir == ZA || (*cube)[i].dir == ZB) {
+			tmp = (*cube)[i].row;
+			(*cube)[i].row = (*cube)[i].col;
+			(*cube)[i].col = 2 - tmp;
+			}
+			if ((*cube)[i].dir == YA) (*cube)[i].dir = XB;
+			else if ((*cube)[i].dir == XA) (*cube)[i].dir = YA;
+			else if ((*cube)[i].dir == YB) (*cube)[i].dir = XA;
+			else if ((*cube)[i].dir == XB) (*cube)[i].dir = YB;
+		break;
+		}
+		
+		(*cube)[i].rot.rdir = RNONE;
+	}	
 }
 
-extern float angle;
-
-void render_plane(t_plane *plane) {
+void plane_render(t_plane *plane) {
 	float s = 0.45;
 	float t = 1.0;
 	/*
@@ -166,5 +246,18 @@ void render_plane(t_plane *plane) {
 	break;
 	}
 }
+
+
+
+void cube_render(t_cube *cube) {
+	for(int i = 0; i < 54; i++) {
+		glPushMatrix();
+		plane_render(&(*cube)[i]);
+		glPopMatrix();
+	}
+
+}
+
+
 
 

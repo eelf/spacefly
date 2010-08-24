@@ -17,11 +17,13 @@ char rotation;
 
 void timer(int value) {
 	if (rotation && angle < 90.0) {
-		angle += 0.5;
+		if (angle < 10.0) angle += 4.0;
+		else if (angle < 70.0) angle += 10.0;
+		else angle += 1.0;
 		glutTimerFunc(50, timer, 0); // Setup next timer
 	} else {
 		rotation = 0;
-		// rotation done, swap planes, reset plane rotation state
+		cube_end_rotate(&cube);
 		angle = 0.0;
 	}
 }
@@ -34,9 +36,9 @@ void renderScene(void) {
 	
 	
 //camera setup
+	glTranslatef(camera.x, camera.y, camera.z);
 	glRotatef(camera.q, 1.0, 0.0, 0.0);
 	glRotatef(camera.r, 0.0, 1.0, 0.0);
-	glTranslatef(camera.x, camera.y, camera.z);
 	
 	glBegin(GL_LINES);
 		/*glColor3f(1.0, 1.0, 0.0);
@@ -57,19 +59,19 @@ void renderScene(void) {
 	glEnd();
 	
 //draw text
-/*
-	sprintf(s, "%.2f %.2f %.2f", camera.x, camera.y, camera.z);
+
+	sprintf(s, "%.2f.%.2f.%.2f %.2fx%.2f", camera.x, camera.y, camera.z, camera.r, camera.q);
 	glPushAttrib(GL_CURRENT_BIT);
 		glColor3f(1.0, 1.0, 0.0); 
 		glPushMatrix();
 			renderBitmapCharacher(0, 3, 0, GLUT_BITMAP_8_BY_13, s);
 		glPopMatrix();
 	glPopAttrib();
-	*/
+	
 
 	
 //draw scene
-	render_cube(&cube);
+	cube_render(&cube);
 	glutSwapBuffers();
 	
 	camera_inert(&camera);
@@ -112,20 +114,54 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'q') camera_rotate(&camera, -4.0, 0.0);
 	if (key == 'z') camera_rotate(&camera,  4.0, 0.0);
 
+	if (key == '`') cube_init(&cube);
+	if (!rotation) {
 	if (key == 'u') {
 		rotation = 1;
-		rotate_sides(&cube, RX, 0);
+		cube_rotate(&cube, RX, 0);
 		glutTimerFunc(50, timer, 0);
 	}
 	if (key == 'i') {
 		rotation = 1;
-		rotate_sides(&cube, RX, 1);
+		cube_rotate(&cube, RX, 1);
 		glutTimerFunc(50, timer, 0);
 	}
 	if (key == 'o') {
 		rotation = 1;
-		rotate_sides(&cube, RX, 2);
+		cube_rotate(&cube, RX, 2);
 		glutTimerFunc(50, timer, 0);
+	}
+
+	if (key == 'j') {
+		rotation = 1;
+		cube_rotate(&cube, RY, 0);
+		glutTimerFunc(50, timer, 0);
+	}
+	if (key == 'k') {
+		rotation = 1;
+		cube_rotate(&cube, RY, 1);
+		glutTimerFunc(50, timer, 0);
+	}
+	if (key == 'l') {
+		rotation = 1;
+		cube_rotate(&cube, RY, 2);
+		glutTimerFunc(50, timer, 0);
+	}
+	if (key == 'm') {
+		rotation = 1;
+		cube_rotate(&cube, RZ, 0);
+		glutTimerFunc(50, timer, 0);
+	}
+	if (key == ',') {
+		rotation = 1;
+		cube_rotate(&cube, RZ, 1);
+		glutTimerFunc(50, timer, 0);
+	}
+	if (key == '.') {
+		rotation = 1;
+		cube_rotate(&cube, RZ, 2);
+		glutTimerFunc(50, timer, 0);
+	}
 	}
 	
 }
@@ -157,7 +193,7 @@ int main(int argc, char **argv) {
   	camera_init(&camera);
 	
 	//init other
-	create_cube(&cube);
+	cube_init(&cube);
 
 	glutMainLoop();
 	// never happen lol

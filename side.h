@@ -30,12 +30,10 @@ typedef struct {
 
 typedef t_plane t_cube[9 * 6];
 
-void copy_color(t_color *a, t_color *b);
-void create_cube(t_cube *cube);
-
-void rotate_sides(t_cube* cube, t_rotation_direction rdir, unsigned char row);
-void render_cube(t_cube *cube);
-void render_plane(t_plane *plane);
+void cube_init(t_cube *cube);
+void cube_rotate(t_cube* cube, t_rotation_direction rdir, unsigned char row);
+void cube_end_rotate(t_cube* cube);
+void cube_render(t_cube *cube);
 
 #endif
 
