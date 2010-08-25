@@ -11,7 +11,7 @@ void camera_init(t_camera* camera) {
 	camera->x = 0.0;
 	camera->y = 0.0;
 	camera->z = -10.0;
-	camera->r = 30.0;
+	camera->r = -45.0;
 	camera->q = 20.0;
 	
 	camera->vx = 0.0;

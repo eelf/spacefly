@@ -17,10 +17,7 @@ char rotation;
 
 void timer(int value) {
 	if (rotation && angle < 90.0) {
-//		if (angle < 10.0) angle += 4.0;
-//		else if (angle < 70.0) 
 		angle += 10.0;
-//		else angle += 1.0;
 		glutTimerFunc(50, timer, 0); // Setup next timer
 	} else {
 		rotation = 0;
@@ -28,7 +25,6 @@ void timer(int value) {
 		angle = 0.0;
 	}
 }
-
 
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -41,11 +37,8 @@ void renderScene(void) {
 	glRotatef(camera.q, 1.0, 0.0, 0.0);
 	glRotatef(camera.r, 0.0, 1.0, 0.0);
 	
+	//рисуем координатные оси
 	glBegin(GL_LINES);
-		/*glColor3f(1.0, 1.0, 0.0);
-		glVertex3f(-camera.x + 1, -camera.y + 1, -camera.z + 1);
-		glVertex3f(0.0, 0.0, 0.0);*/
-
 		glColor3f(0.0, 1.0, 0.0);
 		glVertex3f(0.0, 0.0, 0.0);
 		glVertex3f(100.0, 0.0, 0.0);
@@ -60,7 +53,7 @@ void renderScene(void) {
 	glEnd();
 	
 //draw text
-
+	//пишем координаты камеры
 	sprintf(s, "%.2f.%.2f.%.2f %.2fx%.2f", camera.x, camera.y, camera.z, camera.r, camera.q);
 	glPushAttrib(GL_CURRENT_BIT);
 		glColor3f(1.0, 1.0, 0.0); 
@@ -69,13 +62,11 @@ void renderScene(void) {
 		glPopMatrix();
 	glPopAttrib();
 	
-
-	
 //draw scene
 	cube_render(&cube);
 	glutSwapBuffers();
 	
-	camera_inert(&camera);
+	camera_inert(&camera); //?
 }
 
 
@@ -97,8 +88,6 @@ void changeSize(int w, int h) {
 //	gluLookAt(0.0,0.0,5.0, 
 //		      0.0,0.0,-1.0,
 //			  0.0f,1.0f,0.0f);
-
-
 }
 
 void keyPressed(unsigned char key, int x, int y) {
@@ -169,8 +158,6 @@ void keyPressed(unsigned char key, int x, int y) {
 
 
 int main(int argc, char **argv) {
-//	printf("%d %d %d %d %d %d \n", sizeof(t_cube), sizeof(t_plane), sizeof(t_color), sizeof(t_direction), sizeof(t_rotation), sizeof(t_rotation_direction));
-	
 	glutInit(&argc, argv);
 	
 	// This is where we say that we want a double buffer
@@ -183,17 +170,15 @@ int main(int argc, char **argv) {
 	
 	// here is the setting of the idle function
 	glutIdleFunc(renderScene);
-	
 	glutReshapeFunc(changeSize);
 	glutKeyboardFunc(keyPressed);
 	
 	// enable depth testing
 	glEnable(GL_DEPTH_TEST);
-  	sprintf(s, "%c", 65);
-  	rotation = 0;
-  	camera_init(&camera);
-	
+
 	//init other
+	rotation = 0;
+  	camera_init(&camera);
 	cube_init(&cube);
 
 	glutMainLoop();

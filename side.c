@@ -3,16 +3,23 @@
 #include "gl_extend.h"
 #include "side.h"
 
+/*
+ цвета у кубика располагаются так:
+ белый напротив желтого (верх - низ)
+ синий напротив зеленого (право)
+ красный напротив оранжевого (лево)
+ */
 
-t_color color_red = {1.0, 0.0, 0.0};
-t_color color_blue = {0.0, 0.0, 1.0};
-t_color color_green = {0.0, 1.0, 0.0};
 t_color color_white = {1.0, 1.0, 1.0};
 t_color color_yellow = {1.0, 1.0, 0.0};
-t_color color_magenta = {1.0, 0.0, 1.0};
+
+t_color color_blue = {0.0, 0.0, 1.0};
+t_color color_green = {0.0, 1.0, 0.0};
+
+t_color color_red = {1.0, 0.0, 0.0};
+t_color color_orange = {1.0, 0.6, 0.0};
 
 extern float angle;
-
 
 void copy_color(t_color *a, t_color *b) {
 	(*a)[0] = (*b)[0];
@@ -20,11 +27,10 @@ void copy_color(t_color *a, t_color *b) {
 	(*a)[2] = (*b)[2];
 }
 
-
 void cube_init(t_cube *cube) {
 
 	int row = 0, col = 0, dir = 0;
-	for(int i = 0; i < 6 * 9; i++) {
+	for(int i = 0; i < 6 * 9; i++) { // 6 граней, 9 наклеек
 		(*cube)[i].rot.angle = 0.0;
 		(*cube)[i].rot.rdir = RNONE;
 		
@@ -32,14 +38,12 @@ void cube_init(t_cube *cube) {
 		(*cube)[i].col = col;
 		(*cube)[i].dir = dir;
 		switch((t_direction) dir) {
-		case XA: copy_color(&(*cube)[i].color, &color_green); break;
-		case XB: copy_color(&(*cube)[i].color, &color_blue); break;
-		case YA: copy_color(&(*cube)[i].color, &color_red); break;
-		case YB: copy_color(&(*cube)[i].color, &color_magenta); break;
-		case ZA: copy_color(&(*cube)[i].color, &color_yellow); break;
-		case ZB: copy_color(&(*cube)[i].color, &color_white); break;
-
-
+			case XA: copy_color(&(*cube)[i].color, &color_red); break;
+			case XB: copy_color(&(*cube)[i].color, &color_orange); break;
+			case YA: copy_color(&(*cube)[i].color, &color_white); break;
+			case YB: copy_color(&(*cube)[i].color, &color_yellow); break;
+			case ZA: copy_color(&(*cube)[i].color, &color_blue); break;
+			case ZB: copy_color(&(*cube)[i].color, &color_green); break;
 		}		
 		
 		col++;
@@ -62,9 +66,13 @@ void cube_init(t_cube *cube) {
 	*/
 }
 
-
 void cube_rotate(t_cube* cube, t_rotation_direction rdir, unsigned char row) {
-	
+/*
+ тут мы выбираем направление RX, RY, RZ, далее выбираем колонку
+ от 0 до 2 в случае кубика размерности 3
+ если строка(колонка), короче уровень крайний (в нашем случае 0 или 2), то 
+ задаем всем наклейкам направление поворота
+ */
 	for(int i = 0; i < 54; i++) {
 	switch (rdir) {
 	case RX:
@@ -100,7 +108,7 @@ void cube_rotate(t_cube* cube, t_rotation_direction rdir, unsigned char row) {
 }
 
 
-/*
+/* что это?
 00 01 02	02 12 22
 10 11 12	01 11 21
 20 21 22    00 10 20
@@ -109,12 +117,12 @@ void cube_rotate(t_cube* cube, t_rotation_direction rdir, unsigned char row) {
 10 - 21, 11 - 11, 12 - 01
 20 - 22, 21 - 12, 22 - 02
 */
-void cube_end_rotate(t_cube* cube) {
+void cube_end_rotate(t_cube* cube) { // сделай возможность задания размерности
 	int tmp;
 	for(int i = 0; i < 54; i++) {
 	
 		switch((*cube)[i].rot.rdir) {
-		case RX:
+		case RX: // что происходит не понял
 			if ((*cube)[i].dir == XA || (*cube)[i].dir == XB) {
 			tmp = (*cube)[i].col;
 			(*cube)[i].col = (*cube)[i].row;
@@ -178,12 +186,12 @@ void cube_end_rotate(t_cube* cube) {
 		break;
 		}
 		
-		(*cube)[i].rot.rdir = RNONE;
+		(*cube)[i].rot.rdir = RNONE; // кончили поворачивать
 	}	
 }
 
 void plane_render(t_plane *plane) {
-	float s = 0.5;
+	float s = 0.49;
 	float t = 1.0;
 	/*
 	static float i = 1.0;
@@ -258,8 +266,6 @@ void plane_render(t_plane *plane) {
 	break;
 	}
 }
-
-
 
 void cube_render(t_cube *cube) {
 	for(int i = 0; i < 54; i++) {

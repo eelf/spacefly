@@ -28,7 +28,7 @@ typedef struct {
 	unsigned char row, col;
 } t_plane;
 
-typedef t_plane t_cube[9 * 6];
+typedef t_plane t_cube[9 * 6]; //ммм... а как же многомерные кубики?)
 
 void cube_init(t_cube *cube);
 void cube_rotate(t_cube* cube, t_rotation_direction rdir, unsigned char row);
