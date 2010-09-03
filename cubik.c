@@ -15,6 +15,9 @@ char s[40];
 float angle;
 char rotation;
 
+	GLdouble oX, oY, oZ;
+
+
 void timer(int value) {
 	if (rotation && angle < 90.0) {
 		angle += 10.0;
@@ -54,7 +57,8 @@ void renderScene(void) {
 	
 //draw text
 	//пишем координаты камеры
-	sprintf(s, "%.2f.%.2f.%.2f %.2fx%.2f", camera.x, camera.y, camera.z, camera.r, camera.q);
+//	sprintf(s, "%.2f.%.2f.%.2f %.2fx%.2f", camera.x, camera.y, camera.z, camera.r, camera.q);
+	sprintf(s, "%.2f.%.2f.%.2f", oX, oY, oZ);	
 	glPushAttrib(GL_CURRENT_BIT);
 		glColor3f(1.0, 1.0, 0.0); 
 		glPushMatrix();
@@ -88,6 +92,19 @@ void changeSize(int w, int h) {
 //	gluLookAt(0.0,0.0,5.0, 
 //		      0.0,0.0,-1.0,
 //			  0.0f,1.0f,0.0f);
+}
+
+void mousePressed(int button, int state, int x, int y) {
+	GLint vport[4];
+	GLdouble modl[16], proj[16];
+	GLfloat depth;
+	glGetIntegerv(GL_VIEWPORT, vport);
+	glGetDoublev(GL_MODELVIEW_MATRIX, modl);
+	glGetDoublev(GL_PROJECTION_MATRIX, proj);
+	glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+	gluUnProject(x, y, depth, modl, proj, vport, &oX, &oY, &oZ);
+	
+	
 }
 
 void keyPressed(unsigned char key, int x, int y) {
@@ -172,6 +189,7 @@ int main(int argc, char **argv) {
 	glutIdleFunc(renderScene);
 	glutReshapeFunc(changeSize);
 	glutKeyboardFunc(keyPressed);
+	glutMouseFunc(mousePressed);
 	
 	// enable depth testing
 	glEnable(GL_DEPTH_TEST);
