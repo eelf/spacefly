@@ -19,8 +19,8 @@ endif
 
 ifeq ($(OSTYPE),linux)
 	LDFLAGS += -lglut -lGLU
-else ifeq ($(OSTYPE),mac)
-	LDFLAGS += -lglut -lGLU
+else ifeq ($(OSTYPE),darwin)
+	LDFLAGS += -framework GLUT -framework OpenGL
 else
 	LDFLAGS += -lglut -lGLU
 endif
